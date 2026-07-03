@@ -1,0 +1,449 @@
+/* ==========================================
+   PROJECT R
+   Codename: Confidential
+   Version: 1.0
+========================================== */
+
+:root {
+
+    /* Ana Renkler */
+
+    --background: #0D1117;
+    --surface: #161B22;
+    --primary: #7DD3FC;
+    --text: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --border: rgba(255,255,255,0.08);
+
+    /* Cam Efekti */
+
+    --glass: rgba(255,255,255,0.06);
+    --blur: blur(18px);
+
+    /* Yuvarlak Köşeler */
+
+    --radius-small: 12px;
+    --radius-medium: 20px;
+    --radius-large: 30px;
+
+    /* Gölge */
+
+    --shadow:
+        0 10px 30px rgba(0,0,0,.35);
+
+    /* Animasyon */
+
+    --transition: .35s ease;
+
+}
+/* RESET */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+body{
+
+    background:var(--background);
+
+    color:var(--text);
+
+    font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+    min-height:100vh;
+
+}
+.app{
+
+    width:100%;
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+.phone{
+
+    width:390px;
+    height:844px;
+
+    background:var(--surface);
+
+    border-radius:35px;
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+/* ==========================================
+   SPLASH SCREEN
+========================================== */
+
+.splash{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    padding:40px;
+
+}
+
+.logo{
+
+    width:90px;
+    height:90px;
+
+    border-radius:24px;
+
+    background:#000;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:42px;
+    font-weight:700;
+
+    color:white;
+
+    margin-bottom:35px;
+
+}
+
+.splash h1{
+
+    font-size:34px;
+
+    letter-spacing:3px;
+
+    margin-bottom:10px;
+
+}
+
+.codename{
+
+    color:var(--primary);
+
+    letter-spacing:4px;
+
+    font-size:18px;
+
+}
+
+.userBox{
+
+    margin-top:70px;
+
+}
+
+.userBox span{
+
+    color:var(--text-secondary);
+
+    font-size:14px;
+
+}
+
+.userBox h2{
+
+    margin-top:8px;
+
+    font-size:28px;
+
+    font-weight:600;
+
+}
+
+.loadingText{
+
+    margin-top:90px;
+
+    color:var(--text-secondary);
+
+    font-size:16px;
+
+}
+@keyframes breathe{
+
+    0%{
+
+        transform:scale(1);
+        box-shadow:0 0 0 rgba(125,211,252,0);
+
+    }
+
+    50%{
+
+        transform:scale(1.06);
+        box-shadow:0 0 35px rgba(125,211,252,.18);
+
+    }
+
+    100%{
+
+        transform:scale(1);
+        box-shadow:0 0 0 rgba(125,211,252,0);
+
+    }
+
+}
+
+.logo{
+
+    animation:breathe 3s ease-in-out infinite;
+
+}
+.loadingText{
+
+    margin-top:90px;
+
+    color:var(--text-secondary);
+
+    font-size:16px;
+
+    animation:fadeText 2s infinite;
+
+}
+@keyframes fadeText{
+
+    0%{
+
+        opacity:.35;
+
+    }
+
+    50%{
+
+        opacity:1;
+
+    }
+
+    100%{
+
+        opacity:.35;
+
+    }
+
+}
+.screen{
+
+    width:100%;
+    height:100%;
+
+}
+
+.hidden{
+
+    display:none;
+
+}
+
+.home{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+}
+
+.home h1{
+
+    font-size:32px;
+
+}
+
+.home h2{
+
+    margin-top:15px;
+
+    color:var(--primary);
+
+}
+
+.home p{
+
+    margin-top:25px;
+
+    color:var(--text-secondary);
+
+}
+.home{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    padding:50px 28px;
+
+}
+
+.top{
+
+    display:flex;
+    flex-direction:column;
+
+    margin-bottom:40px;
+
+}
+
+.miniTitle{
+
+    font-size:28px;
+    font-weight:700;
+
+}
+
+.codeName{
+
+    color:var(--primary);
+
+    margin-top:6px;
+
+    letter-spacing:2px;
+
+}
+.welcome{
+
+    margin-bottom:30px;
+
+}
+
+.welcome h1{
+
+    font-size:36px;
+
+}
+
+.welcome h2{
+
+    margin-top:10px;
+
+    color:var(--primary);
+
+    font-size:28px;
+
+}
+.counterCard{
+
+    background:var(--glass);
+
+    backdrop-filter:var(--blur);
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+    padding:18px;
+
+    margin-bottom:30px;
+
+    font-size:20px;
+
+}
+.menu{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+.card{
+
+    background:var(--glass);
+
+    backdrop-filter:var(--blur);
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+    padding:20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:all .35s ease;
+
+}
+.card:hover{
+
+    transform:translateY(-5px);
+
+    border-color:var(--primary);
+
+}
+.card h3{
+
+    margin-bottom:8px;
+
+    font-size:22px;
+
+}
+
+.card p{
+
+    color:var(--text-secondary);
+
+}
+.card{
+
+    opacity:0;
+
+    transform:translateY(25px);
+
+}
+.card.show{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+    transition:
+        opacity .5s ease,
+        transform .5s ease;
+
+}
+.card:active{
+
+    transform:scale(.97);
+
+}
