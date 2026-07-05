@@ -1,619 +1,1393 @@
-const stats = JSON.parse(localStorage.getItem("projectRStats")) || {
+/* ==========================================
+   PROJECT R
+   Codename: Confidential
+   Version: 1.0
+========================================== */
 
-    visits: 0,
+:root {
 
-    chapterReads: 0,
+    /* Ana Renkler */
 
-    playlistOpens: 0,
+    --background: #0D1117;
+    --surface: #161B22;
+    --primary: #7DD3FC;
+    --text: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --border: rgba(255, 255, 255, 0.08);
 
-    memoryOpens: 0,
+    /* Cam Efekti */
 
-    bucketOpens: 0,
+    --glass: rgba(255, 255, 255, 0.06);
+    --blur: blur(18px);
 
-    easterEggFound: 0,
+    /* Yuvarlak Köşeler */
 
-    firstVisit: null,
+    --radius-small: 12px;
+    --radius-medium: 20px;
+    --radius-large: 30px;
 
-    lastVisit: null
+    /* Gölge */
 
-};
+    --shadow:
+        0 10px 30px rgba(0, 0, 0, .35);
 
-function saveStats() {
+    /* Animasyon */
 
-    localStorage.setItem(
-        "projectRStats",
-        JSON.stringify(stats)
-    );
-
-}
-/* ==========================
-   LOADING MESSAGES
-========================== */
-
-const loadingMessages = [
-    "Anılar yükleniyor...",
-    "Playlist hazırlanıyor...",
-    "Chapter One açılıyor...",
-    "Bugünün mesajı seçiliyor...",
-    "Özel içerikler hazırlanıyor...",
-    "Güzel anılar hatırlanıyor...",
-    "Müzikler hazırlanıyor...",
-    "Project R başlatılıyor..."
-];
-
-const loadingText = document.getElementById("loadingText");
-loadingText.textContent =
-    loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-
-/* ==========================
-   SCREENS
-========================== */
-
-const splashScreen = document.getElementById("splashScreen");
-const homeScreen = document.getElementById("homeScreen");
-const chapterScreen = document.getElementById("chapterScreen");
-
-/* ==========================
-   SPLASH
-========================== */
-
-// App started
-stats.visits++;
-
-if (!stats.firstVisit) {
-    stats.firstVisit = Date.now();
-}
-
-stats.lastVisit = Date.now();
-
-saveStats();
-
-setTimeout(() => {
-
-    splashScreen.classList.add("hidden");
-    homeScreen.classList.remove("hidden");
-
-}, 3000);
-
-/* ==========================
-   GREETING
-========================== */
-
-const greeting = document.getElementById("greeting");
-const hour = new Date().getHours();
-
-if (hour >= 5 && hour < 12) {
-
-    greeting.innerHTML = "☀️ Günaydın";
-
-} else if (hour >= 12 && hour < 18) {
-
-    greeting.innerHTML = "🌤️ İyi Günler";
-
-} else if (hour >= 18 && hour < 22) {
-
-    greeting.innerHTML = "🌇 İyi Akşamlar";
-
-} else {
-
-    greeting.innerHTML = "🌙 İyi Geceler";
+    --transition: .35s ease;
 
 }
 
-/* ==========================
-   LOVE COUNTER
-========================== */
+/* RESET */
 
-const loveCounter = document.getElementById("loveCounter");
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-// İlişkinin başlangıcı
-const startDate = new Date("2026-06-13T17:12:00");
+body {
 
-const totalDays = Math.floor(
-    (new Date() - startDate) / (1000 * 60 * 60 * 24)
-);
+    background: var(--background);
 
-function updateLoveCounter() {
+    color: var(--text);
 
-    const now = new Date();
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 
-    let diff = now - startDate;
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    diff %= (1000 * 60 * 60 * 24);
-
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    diff %= (1000 * 60 * 60);
-
-    const minutes = Math.floor(diff / (1000 * 60));
-    diff %= (1000 * 60);
-
-    const seconds = Math.floor(diff / 1000);
-
-    loveCounter.innerHTML =
-        `❤️ ${days}g • ${hours}sa • ${minutes}dk • ${seconds}sn`;
+    min-height: 100vh;
 
 }
 
-updateLoveCounter();
+.app {
 
-setInterval(updateLoveCounter, 1000);
+    width: 100%;
+    min-height: 100vh;
 
-/* ==========================
-   CARD ANIMATION
-========================== */
+    display: flex;
 
-const cards = document.querySelectorAll(".card");
+    justify-content: center;
 
-cards.forEach((card, index) => {
+    align-items: center;
 
-    setTimeout(() => {
+}
 
-        card.classList.add("show");
+.phone {
 
-    }, index * 150);
+    width: 390px;
+    height: 844px;
 
-});
+    background: var(--surface);
 
-/* ==========================
-   PAGE NAVIGATION
-========================== */
+    border-radius: 35px;
+
+    border: 1px solid var(--border);
+
+    box-shadow: var(--shadow);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+/* ==========================================
+   SPLASH SCREEN
+========================================== */
+
+.splash {
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    padding: 40px;
+
+}
+
+.logo {
+
+    width: 90px;
+    height: 90px;
+
+    border-radius: 24px;
+
+    background: #000;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 42px;
+    font-weight: 700;
+
+    color: white;
+
+    margin-bottom: 35px;
+
+}
+
+.splash h1 {
+
+    font-size: 34px;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 10px;
+
+}
+
+.codename {
+
+    color: var(--primary);
+
+    letter-spacing: 4px;
+
+    font-size: 18px;
+
+}
+
+.userBox {
+
+    margin-top: 70px;
+
+}
+
+.userBox span {
+
+    color: var(--text-secondary);
+
+    font-size: 14px;
+
+}
+
+.userBox h2 {
+
+    margin-top: 8px;
+
+    font-size: 28px;
+
+    font-weight: 600;
+
+}
+
+.loadingText {
+
+    margin-top: 90px;
+
+    color: var(--text-secondary);
+
+    font-size: 16px;
+
+}
+
+@keyframes breathe {
+
+    0% {
+
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(125, 211, 252, 0);
+
+    }
+
+    50% {
+
+        transform: scale(1.06);
+        box-shadow: 0 0 35px rgba(125, 211, 252, .18);
+
+    }
+
+    100% {
+
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(125, 211, 252, 0);
+
+    }
+
+}
+
+.logo {
+
+    animation: breathe 3s ease-in-out infinite;
+
+}
+
+.loadingText {
+
+    margin-top: 90px;
+
+    color: var(--text-secondary);
+
+    font-size: 16px;
+
+    animation: fadeText 2s infinite;
+
+}
+
+@keyframes fadeText {
+
+    0% {
+
+        opacity: .35;
+
+    }
+
+    50% {
+
+        opacity: 1;
+
+    }
+
+    100% {
+
+        opacity: .35;
+
+    }
+
+}
+
+.screen {
+
+    width: 100%;
+    height: 100%;
+
+}
+
+.hidden {
+
+    display: none;
+
+}
+
+.home {
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+}
+
+.home h1 {
+
+    font-size: 32px;
+
+}
+
+.home h2 {
+
+    margin-top: 15px;
+
+    color: var(--primary);
+
+}
+
+.home p {
+
+    margin-top: 25px;
+
+    color: var(--text-secondary);
+
+}
+
+.home{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    padding:30px 25px;
+
+    overflow-y:auto;
+
+}
+
+
+.welcome {
+
+    margin-bottom: 20px;
+
+}
+
+.welcome h1 {
+
+    font-size: 36px;
+
+}
+
+.welcome h2 {
+
+    margin-top: 10px;
+
+    color: var(--primary);
+
+    font-size: 28px;
+
+}
+
+.counterCard{
+
+    background:var(--glass);
+
+    backdrop-filter:var(--blur);
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+    padding:18px;
+
+    margin-bottom:25px;
+
+    text-align:center;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    letter-spacing:.4px;
+
+}
+
+.menu {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+}
+
+.card {
+
+    background: var(--glass);
+
+    backdrop-filter: var(--blur);
+
+    border: 1px solid var(--border);
+
+    border-radius: 16px;
+
+    padding: 16px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    cursor: pointer;
+
+    transition: all .35s ease;
+
+}
+
+.card:hover {
+
+    transform: translateY(-5px);
+
+    border-color: var(--primary);
+
+}
+
+.card h3 {
+
+    margin-bottom: 8px;
+
+    font-size: 22px;
+
+}
+
+.card p {
+
+    color: var(--text-secondary);
+
+}
+
+.card {
+
+    opacity: 0;
+
+    transform: translateY(25px);
+
+}
+
+.card.show {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+    transition:
+        opacity .5s ease,
+        transform .5s ease;
+
+}
+
+.card:active {
+
+    transform: scale(.97);
+
+}
 
 /* ==========================
    CHAPTER ONE
 ========================== */
 
-const chapterCard = document.getElementById("chapterCard");
+.letterPage {
 
-const closeLetter = document.getElementById("closeLetter");
+    width: 100%;
+    height: 100%;
 
-const envelope = document.getElementById("envelope");
-const letter = document.getElementById("letter");
-const tapText = document.getElementById("tapText");
+    display: flex;
 
-let opened = false;
+    flex-direction: column;
 
-/* Home -> Chapter */
+    justify-content: center;
 
-chapterCard.onclick = () => {
+    align-items: center;
 
-    homeScreen.classList.add("hidden");
-    chapterScreen.classList.remove("hidden");
-
-    if (localStorage.getItem("chapterOneRead")) {
-
-        tapText.textContent = "Read again ❤️";
-
-    } else {
-
-        tapText.textContent = "Tap the envelope";
-
-    }
-
-};
-
-/* Envelope */
-
-envelope.onclick = () => {
-
-
-    if (opened) return;
-
-    stats.chapterReads++;
-
-    saveStats();
-
-    opened = true;
-
-
-    localStorage.setItem("chapterOneRead", "true");
-
-    tapText.style.opacity = "0";
-
-    /* Açık zarf */
-
-    envelope.src = "assets/images/envelope_open.png";
-
-    /* Kağıt çıksın */
-
-    setTimeout(() => {
-
-        letter.classList.add("show");
-
-    }, 350);
-
-    /* Zarf kaybolsun */
-
-    setTimeout(() => {
-
-        envelope.classList.add("hide");
-
-    }, 900);
-
-    /* Blur + büyüme */
-
-    setTimeout(() => {
-
-        document.body.classList.add("blur");
-
-        letter.classList.add("fullscreen");
-
-    }, 1200);
-
-};
-
-/* Geri */
-
-backButton.onclick = () => {
-
-    if (!opened) {
-
-        chapterScreen.classList.add("hidden");
-        homeScreen.classList.remove("hidden");
-        return;
-
-    }
-
-    /* Blur kalk */
-
-    document.body.classList.remove("blur");
-
-    /* Kağıt küçül */
-
-    letter.classList.remove("fullscreen");
-
-    setTimeout(() => {
-
-        /* Zarf geri gelsin */
-
-        envelope.classList.remove("hide");
-
-        envelope.src = "assets/images/envelope_open.png";
-
-        /* Kağıt aşağı insin */
-
-        letter.classList.remove("show");
-
-    }, 500);
-
-    setTimeout(() => {
-
-        /* Zarf kapansın */
-
-        envelope.src = "assets/images/envelope_closed.png";
-
-    }, 1000);
-
-    setTimeout(() => {
-
-        tapText.style.opacity = "1";
-
-        opened = false;
-
-        chapterScreen.classList.add("hidden");
-        homeScreen.classList.remove("hidden");
-
-    }, 1400);
-
-};
-const playlistCard = document.getElementById("playlistCard");
-const playlistScreen = document.getElementById("playlistScreen");
-const playlistBack = document.getElementById("playlistBack");
-
-const hosPlaylist = document.getElementById("hosPlaylist");
-const mePlaylist = document.getElementById("mePlaylist");
-playlistCard.onclick = () => {
-
-    homeScreen.classList.add("hidden");
-
-    playlistScreen.classList.remove("hidden");
-
-}
-playlistBack.onclick = () => {
-
-    playlistScreen.classList.add("hidden");
-
-    homeScreen.classList.remove("hidden");
-
-}
-hosPlaylist.onclick = () => {
-    stats.playlistOpens++;
-
-    saveStats();
-
-    hosPlaylist.style.transform = "scale(.96)";
-
-    setTimeout(() => {
-
-        window.open(
-            "https://music.youtube.com/playlist?list=PLTK7rWp4bSWVNkBXRlWXfDOkDoyeryGvH",
-            "_blank"
-        );
-
-        hosPlaylist.style.transform = "scale(1)";
-
-    }, 250);
-
-}
-mePlaylist.onclick = () => {
-
-    mePlaylist.style.transform = "scale(.96)";
-
-    setTimeout(() => {
-
-        window.open(
-            "https://music.youtube.com/playlist?list=PL9oQ3ZnU-hYfq6x6Ooqv3gujQDhEYvB8O",
-            "_blank"
-        );
-
-        mePlaylist.style.transform = "scale(1)";
-
-    }, 250);
-
-}
-const bucketCard = document.getElementById("bucketCard");
-const bucketScreen = document.getElementById("bucketScreen");
-const bucketBack = document.getElementById("bucketBack");
-const bucketList = document.getElementById("bucketList");
-
-const bucketItems = [
-
-    { text: "İlk kahvemiz", done: true },
-
-    { text: "İlk ay dönümümüz", done: false },
-
-    { text: "Birlikte gün doğumu izlemek", done: false },
-
-    { text: "Aynı şehirde yaşamak", done: false },
-
-    { text: "Beraber tatile gitmek", done: false },
-
-    { text: "Birlikte konsere gitmek", done: false },
-
-    { text: "İlk evimiz", done: false },
-
-    { text: "Dünyayı birlikte gezmek", done: false }
-
-];
-
-bucketItems.forEach(item => {
-
-    const div = document.createElement("div");
-
-    div.className = "bucketItem";
-
-    if (item.done) {
-
-        div.innerHTML = `
-            <span class="bucketIcon">☑</span>
-            <span class="bucketDone">${item.text}</span>
-        `;
-
-    } else {
-
-        div.innerHTML = `
-            <span class="bucketIcon">☐</span>
-            <span>${item.text}</span>
-        `;
-
-    }
-
-    bucketList.appendChild(div);
-
-});
-
-bucketCard.onclick = () => {
-    stats.bucketOpens++;
-
-    saveStats();
-
-    homeScreen.classList.add("hidden");
-
-    bucketScreen.classList.remove("hidden");
+    gap: 25px;
 
 }
 
-bucketBack.onclick = () => {
+.letterPage h1 {
 
-    bucketScreen.classList.add("hidden");
-
-    homeScreen.classList.remove("hidden");
+    font-size: 34px;
 
 }
 
-const memoryCard = document.getElementById("memoryCard");
+.letterPage p {
 
-const memoryScreen = document.getElementById("memoryScreen");
-
-const memoryBack = document.getElementById("memoryBack");
-
-memoryCard.onclick = () => {
-    stats.memoryOpens++;
-
-    saveStats();
-
-    homeScreen.classList.add("hidden");
-
-    memoryScreen.classList.remove("hidden");
+    color: var(--text-secondary);
 
 }
 
-memoryBack.onclick = () => {
+#backButton {
 
-    memoryScreen.classList.add("hidden");
+    position: absolute;
 
-    homeScreen.classList.remove("hidden");
+    top: 35px;
 
-}
+    left: 25px;
 
-const dailyNote = document.getElementById("dailyNote");
+    width: 45px;
 
-const notes = [
+    height: 45px;
 
-    "Bugün de aklımdasın. ❤️",
+    border: none;
 
-    "Gülüşün bütün günümü güzelleştiriyor.",
+    border-radius: 50%;
 
-    "İyi ki varsın.",
+    cursor: pointer;
 
-    "Sesini duymak bile yetiyor.",
+    font-size: 22px;
 
-    "Her geçen gün seni daha çok seviyorum.",
+    color: white;
 
-    "Seninle konuştuğum her dakika en sevdiğim an oluyor.",
-
-    "Birlikte yaşayacağımız günleri sabırsızlıkla bekliyorum.",
-
-    "Umarım bugün yüzünden gülümseme eksik olmaz.",
-
-    "Bugün kendine iyi davran. ❤️",
-
-    "Sen mutluysan ben de mutluyum."
-
-];
-const specialMessages = {
-
-    "14-2": "💘 Mutlu Sevgililer Günü sevgilim. Seni çok seviyorum. ❤️",
-
-    "20-6": "🎂 İyi ki doğdun sevgilim. Hayatımın en güzel insanı iyi ki doğmuş. ❤️",
-
-    "25-3": "🎂 Bugün benim doğum günüm ama en güzel hediyem yine sensin. ❤️",
-
-    "13-6": "🎉 Bugün hikâyemizin yıl dönümü. İyi ki o gün 'biz' olduk.",
-
-    "24-12": "🎄 Seninle yeni bir yıla gireceğim için çok mutluyum.",
-
-    "31-12": "🎆 Bu yılın en güzel anıları seninleydi.",
-
-    "1-1": "🎊 Yeni yılda da ilk dileğim yine sensin."
-
-};
-
-const milestoneMessages = {
-
-    30: "🌱 Bugün birlikte 30 günü geride bıraktık. ❤️",
-
-    50: "⭐ 50 gün... Daha nice günlere.",
-
-    100: "💯 Tam 100 gündür birlikteyiz. Her gününe değer. ❤️",
-
-    180: "🌹 Yarım yılı birlikte geride bıraktık.",
-
-    365: "🎉 Bugün bir yılımız doldu. Seni çok seviyorum.",
-
-    500: "💖 500 gün... Hikâyemiz daha yeni başlıyor.",
-
-    730: "✨ İkinci yılımız kutlu olsun sevgilim.",
-
-    1000: "💎 Bin gün... Kelimeler yetmiyor."
-
-};
-
-const now = new Date();
-
-const day = now.getDate();
-
-const month = now.getMonth() + 1;
-
-const key = `${day}-${month}`;
-
-/* Önce özel gün */
-
-if (specialMessages[key]) {
-
-    dailyNote.textContent = specialMessages[key];
+    background: var(--glass);
 
 }
 
-/* Sonra kilometre taşı */
+/* ==========================
+   ENVELOPE
+========================== */
 
-else if (milestoneMessages[totalDays]) {
+/* =====================================================
+   CHAPTER ONE
+===================================================== */
 
-    dailyNote.textContent = milestoneMessages[totalDays];
+.chapterPage{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    padding-top:40px;
+
+    position:relative;
 
 }
 
-/* Her ayın 13'ü */
+.chapterPage h1{
 
-else if (day === 13) {
-
-    const monthsTogether =
-
-        (now.getFullYear() - 2026) * 12 +
-
-        (month - 6) + 1;
-
-    dailyNote.textContent =
-
-        `❤️ Bugün ${monthsTogether}. ayımız. İyi ki varsın.`;
+    font-size:38px;
+    margin-bottom:40px;
 
 }
 
-/* Normal mesaj */
+.backButton{
 
-else {
+    position:fixed;
 
-    dailyNote.textContent =
+    top:20px;
+    left:20px;
 
-        notes[Math.floor(Math.random() * notes.length)];
+    width:46px;
+    height:46px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(15,23,42,.75);
+
+    color:#fff;
+
+    font-size:24px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:0 8px 25px rgba(0,0,0,.35);
+
+    z-index:2000;
+
+    transition:.25s;
+
+}
+
+.backButton:hover{
+
+    background:rgba(30,41,59,.9);
+
+    transform:scale(1.08);
+
+}
+
+.backButton:active{
+
+    transform:scale(.95);
+
+}
+
+.scene{
+
+    position:relative;
+
+    width:260px;
+    height:320px;
+
+}
+
+/* ======================
+      LETTER
+====================== */
+
+.letter{
+
+    position:absolute;
+
+    left:50%;
+    bottom:0;
+
+    width:190px;
+    height:250px;
+
+    transform:translateX(-50%) translateY(70px);
+
+    background:#f8f5ee;
+
+    border-radius:18px;
+
+    box-shadow:0 18px 45px rgba(0,0,0,.35);
+
+    overflow:hidden;
+
+    opacity:0;
+
+    z-index:1;
+
+    transition:
+
+        transform .8s ease,
+
+        opacity .8s ease,
+
+        width .8s ease,
+
+        height .8s ease,
+
+        border-radius .8s ease;
+
+}
+
+/* kağıt çıktı */
+
+.letter.show{
+
+    transform:translateX(-50%) translateY(-80px);
+
+    opacity:1;
+
+}
+
+/* tam ekran */
+
+.letter.fullscreen{
+
+    position:fixed;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:320px;
+
+    height:700px;
+
+    border-radius:26px;
+
+    z-index:999;
+
+}
+
+/* ======================
+      CONTENT
+====================== */
+
+.letterContent{
+
+    width:100%;
+    height:100%;
+
+    overflow-y:auto;
+
+    padding:35px;
+
+    color:#303030;
+
+    line-height:2;
+
+    scrollbar-width:none;
+
+}
+
+
+.letterContent h2{
+
+    margin-bottom:25px;
+
+    font-size:42px;
+
+}
+
+.letterContent p{
+
+    color:#555;
+
+    font-size:18px;
+
+}
+
+/* ======================
+      ENVELOPE
+====================== */
+
+.envelope{
+
+    position:absolute;
+
+    left:50%;
+    bottom:0;
+
+    width:240px;
+
+    transform:translateX(-50%);
+
+    cursor:pointer;
+
+    z-index:5;
+
+    transition:
+
+        transform .8s ease,
+
+        opacity .6s ease;
+
+}
+
+/* aşağı kaybol */
+
+.envelope.hide{
+
+    transform:
+
+        translateX(-50%)
+
+        translateY(170px);
+
+    opacity:0;
+
+}
+
+/* ======================
+      TAP TEXT
+====================== */
+
+#tapText{
+
+    margin-top:30px;
+
+    color:#8fa6d5;
+
+    transition:.3s;
+
+}
+
+/* ======================
+      OVERLAY
+====================== */
+
+body.blur::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    backdrop-filter:blur(12px);
+
+    z-index:900;
+
+}
+.playlistGrid{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:22px;
+
+    margin-top:45px;
+
+}
+
+.playlistCard{
+
+    width:145px;
+
+    cursor:pointer;
+
+    text-align:center;
+
+    transition:.25s;
+
+}
+
+.playlistCard:hover{
+
+    transform:scale(1.03);
+
+}
+
+.playlistCard:active{
+
+    transform:scale(.97);
+
+}
+
+.playlistCover{
+
+    width:145px;
+
+    height:145px;
+
+    border-radius:22px;
+
+    object-fit:cover;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+
+}
+
+.playlistCard h2{
+
+    margin-top:14px;
+
+    font-size:22px;
+
+}
+
+.playlistCard p{
+
+    margin-top:8px;
+
+    color:#94A3B8;
+
+    font-size:14px;
+
+}
+.playlistCover{
+    transition: .3s;
+}
+
+.playlistCover:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 18px 35px rgba(0,0,0,.35);
+}
+/* ==========================
+   PLAYLIST PAGE
+========================== */
+
+.playlistPage{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    padding:40px 20px;
+
+}
+
+/* ==========================
+   PLAYLIST HEADER
+========================== */
+
+.playlistHeader{
+
+    position:relative;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    margin-bottom:50px;
+
+}
+
+.playlistHeader h1{
+
+    margin:0;
+
+    font-size:36px;
+
+}
+
+.playlistHeader .backButton{
+
+    position:absolute;
+
+    left:0;
+
+}
+/* ==========================
+   BUCKET LIST
+========================== */
+
+.bucketPage{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    padding:40px 22px;
+
+}
+
+.bucketHeader{
+
+    position:relative;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    margin-bottom:10px;
+
+}
+
+.bucketHeader .backButton{
+
+    position:absolute;
+
+    left:0;
+
+}
+
+.bucketHeader h1{
+
+    margin:0;
+
+    font-size:36px;
+
+}
+
+.bucketSubtitle{
+
+    color:#94A3B8;
+
+    margin-bottom:35px;
+
+}
+
+#bucketList{
+
+    width:100%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.bucketItem{
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:18px 20px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    transition:.25s;
+
+}
+
+.bucketItem:hover{
+
+    transform:translateY(-2px);
+
+    background:rgba(255,255,255,.08);
+
+}
+
+.bucketIcon{
+
+    font-size:22px;
+
+}
+
+.bucketDone{
+
+    opacity:.65;
+
+    text-decoration:line-through;
+
+}
+/* ==========================
+   MEMORY BOX
+========================== */
+
+.memoryPage{
+
+    width:100%;
+    height:100%;
+
+    padding:40px 24px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+}
+
+.memoryHeader{
+
+    width:100%;
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.memoryHeader .backButton{
+
+    position:absolute;
+
+    left:0;
+
+}
+
+.memoryHeader h1{
+
+    font-size:38px;
+
+}
+
+.memorySubtitle{
+
+    margin-top:18px;
+
+    color:#94A3B8;
+
+    text-align:center;
+
+    line-height:1.7;
+
+}
+
+.memoryGrid{
+
+    margin-top:40px;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:18px;
+
+}
+
+.memoryPhoto{
+
+    height:155px;
+
+    border-radius:24px;
+
+    border:2px dashed rgba(255,255,255,.12);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:48px;
+
+    color:#6d7d95;
+
+    transition:.25s;
+
+}
+
+.memoryPhoto:hover{
+
+    transform:translateY(-3px);
+
+    border-color:#7DD3FC;
+
+}
+
+.memoryInfo{
+
+    margin-top:35px;
+
+    width:100%;
+
+    padding:28px;
+
+    border-radius:24px;
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    text-align:center;
+
+}
+
+.memoryInfo .heart{
+
+    font-size:34px;
+
+    margin-bottom:12px;
+
+}
+
+.memoryInfo h2{
+
+    margin-bottom:12px;
+
+}
+
+.memoryInfo p{
+
+    color:#94A3B8;
+
+    line-height:1.8;
+
+}
+.footerNote{
+
+    margin-top:18px;
+
+    text-align:center;
+
+    padding-bottom:10px;
+
+}
+
+
+.footerNote h3{
+
+    font-size:18px;
+
+    margin-bottom:10px;
+
+    color:var(--primary);
+
+}
+
+.footerNote p{
+
+    color:#94A3B8;
+
+    font-style:italic;
+
+    font-size:15px;
+
+    line-height:1.6;
 
 }
 /* ==========================
    DEVELOPER MODE
 ========================== */
 
-const logo = document.querySelector(".logo");
+#developerModal{
 
-const developerModal =
-    document.getElementById("developerModal");
+    position:fixed;
 
-const closeDeveloper =
-    document.getElementById("closeDeveloper");
+    inset:0;
 
-let clickCount = 0;
+    background:rgba(0,0,0,.75);
 
-logo.addEventListener("click", () => {
+    backdrop-filter:blur(14px);
 
-    clickCount++;
+    display:flex;
 
-    if (clickCount === 3) {
+    justify-content:center;
 
-        stats.easterEggFound++;
+    align-items:center;
 
-        saveStats();
+    z-index:9999;
 
-        developerModal.classList.remove("hidden");
+}
 
-        clickCount = 0;
+#developerModal.hidden{
 
-    }
+    display:none;
 
-});
+}
 
-closeDeveloper.onclick = () => {
+.developerCard{
 
-    developerModal.classList.add("hidden");
+    width:320px;
 
-};
-/*==========================
-   DEVELOPER UTILITIES
-==========================*/
-window.projectR = {
+    max-width:90%;
 
-    stats,
+    max-height:80vh;
 
-    resetStats() {
+    overflow-y:auto;
 
-        localStorage.removeItem("projectRStats");
+    background:#111821;
 
-        location.reload();
+    border:1px solid rgba(125,211,252,.25);
 
-    },
+    border-radius:24px;
 
-    showStats() {
+    padding:30px;
 
-        console.table(stats);
+    text-align:center;
 
-    }
+    color:white;
 
-};
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+
+}
+
+.developerCard h1{
+
+    color:#7DD3FC;
+
+    margin-bottom:20px;
+
+    letter-spacing:2px;
+
+}
+
+.developerCard p{
+
+    margin:12px 0;
+
+    line-height:1.7;
+
+}
+
+#closeDeveloper{
+
+    margin-top:30px;
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    background:#7DD3FC;
+
+    color:#111;
+
+    font-weight:700;
+
+    transition:.25s;
+
+}
+
+#closeDeveloper:hover{
+
+    transform:scale(1.03);
+
+}
+.playlistQuote{
+
+    margin-top:6px;
+    font-size:12px;
+    color:#94A3B8;
+    opacity:.7;
+    font-style:italic;
+
+}
+
+.playlistQuote{
+
+    display:block;
+
+    margin-top:6px;
+
+    font-size:12px;
+
+    color:#94A3B8;
+
+    opacity:.75;
+
+    font-style:italic;
+
+    line-height:1.4;
+
+}
+
+#milestoneModal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    backdrop-filter:blur(8px);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:3000;
+
+}
+
+#milestoneModal.hidden{
+
+    display:none;
+
+}
+
+.milestoneCard{
+
+    width:300px;
+
+    padding:28px;
+
+    border-radius:22px;
+
+    background:#111827;
+
+    color:white;
+
+    text-align:center;
+
+    box-shadow:0 20px 50px rgba(0,0,0,.4);
+
+    animation:fadeIn .35s;
+
+}
+
+.milestoneCard h1{
+
+    margin-bottom:15px;
+
+}
+
+.milestoneCard p{
+
+    line-height:1.6;
+
+}
+
+.milestoneCard span{
+
+    display:block;
+
+    margin-top:25px;
+
+    opacity:.6;
+
+    font-size:14px;
+
+}
+
