@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Project R</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="app">
+
+        <div class="phone">
+
+            <!-- Splash Screen -->
+
+            <div class="screen" id="splashScreen">
+
+                <div class="splash">
+
+                    <div class="logo">
+                        R
+                    </div>
+
+                    <h1>PROJECT R</h1>
+
+                    <p class="codename">
+                        Confidential
+                    </p>
+
+                    <div class="userBox">
+
+                        <span>Yetkili Kullanıcı</span>
+
+                        <h2>Raziye</h2>
+
+                    </div>
+
+                    <div class="loadingText" id="loadingText">
+
+                        Başlatılıyor...
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Home Screen -->
+
+            <div class="screen hidden" id="homeScreen">
+
+                <div class="home">
+
+
+
+                    <div class="welcome">
+
+                        <h1 id="greeting">
+                            ☀️ Günaydın
+                        </h1>
+
+                        <h2>Raziye</h2>
+
+                    </div>
+
+                    <div class="counterCard">
+
+                        <span id="loveCounter">
+                            Hesaplanıyor...
+                        </span>
+
+                    </div>
+
+
+                    <div class="menu">
+
+                        <div class="card" id="chapterCard">
+
+                            <div>
+
+                                <h3>💌 Chapter One</h3>
+
+                                <p>İlk mektubumuz</p>
+
+                            </div>
+
+                            <span>›</span>
+
+                        </div>
+
+                        <div class="card" id="memoryCard">
+
+                            <div>
+
+                                <h3>📸 Memory Box</h3>
+
+                                <p>Anılarımız</p>
+
+                            </div>
+
+                            <span>›</span>
+
+                        </div>
+
+                        <div class="card" id="playlistCard">
+
+                            <div>
+
+                                <h3>🎵 Playlist</h3>
+
+                                <p>Bizim şarkılarımız...</p>
+
+                            </div>
+
+                            <span>›</span>
+
+                        </div>
+
+                        <div class="card" id="bucketCard">
+
+                            <div>
+
+                                <h3>⭐ Bucket List</h3>
+
+                                <p>Birlikte yapacaklarımız</p>
+
+                            </div>
+
+                            <span>›</span>
+
+                        </div>
+
+                    </div>
+                    <div class="footerNote">
+
+                        <p id="dailyNote"></p>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- Playlist Screen -->
+
+            <div class="screen hidden" id="playlistScreen">
+
+                <div class="playlistPage">
+
+                    <div class="playlistHeader">
+
+                        <button class="backButton" id="playlistBack">
+                            ←
+                        </button>
+
+                        <h1>🎵 Playlist</h1>
+
+                    </div>
+
+                    <div class="playlistGrid">
+
+                        <div class="playlistCard" id="hosPlaylist">
+
+                            <img src="assets/images/hos.jpg" class="playlistCover">
+
+                            <h2>Hoş</h2>
+
+                            <p>24 şarkı • 1 sa 37 dk</p>
+                            <span class="playlistQuote">
+                                Where everything began.
+                            </span>
+
+                        </div>
+
+                        <div class="playlistCard" id="mePlaylist">
+
+                            <img src="assets/images/me.jpg" class="playlistCover">
+
+                            <h2>Me</h2>
+
+                            <p>31 şarkı • 2 sa 05 dk</p>
+
+                            <span class="playlistQuote">
+                                A little piece of you.
+                            </span>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- MEMORY BOX -->
+
+            <div class="screen hidden" id="memoryScreen">
+
+                <div class="memoryPage">
+
+                    <div class="memoryHeader">
+
+                        <button class="backButton" id="memoryBack">
+                            ←
+                        </button>
+
+                        <h1>📸 Memory Box</h1>
+
+                    </div>
+
+                    <p class="memorySubtitle">
+                        Hikâyemize şahitlik edecek fotoğraflar burada yerini alacak.
+                    </p>
+
+                    <div class="memoryGrid">
+
+                        <div class="memoryPhoto">
+                            <span>🖼️</span>
+                        </div>
+
+                        <div class="memoryPhoto">
+                            <span>🖼️</span>
+                        </div>
+
+                        <div class="memoryPhoto">
+                            <span>🖼️</span>
+                        </div>
+
+                        <div class="memoryPhoto">
+                            <span>🖼️</span>
+                        </div>
+
+                    </div>
+
+                    <div class="memoryInfo">
+
+                        <div class="heart">💙</div>
+
+                        <h2>Bir gün burası anılarımızla dolacak.</h2>
+
+                        <p>
+
+                            Bugün boş görünüyor olabilir.
+
+                            <br>
+
+                            Ama her güzel hikâye ilk sayfasıyla başlar.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- Bucket Screen -->
+
+            <div class="screen hidden" id="bucketScreen">
+
+                <div class="bucketPage">
+
+                    <div class="bucketHeader">
+
+                        <button class="backButton" id="bucketBack">
+                            ←
+                        </button>
+
+                        <h1>⭐ Bucket List</h1>
+
+                    </div>
+
+                    <p class="bucketSubtitle">
+                        Birlikte gerçekleştireceklerimiz.
+                    </p>
+
+                    <div id="bucketList"></div>
+
+                </div>
+
+            </div>
+            <!-- Chapter One Screen -->
+
+            <!-- ==========================
+     CHAPTER ONE
+========================== -->
+
+            <div class="screen hidden" id="chapterScreen">
+
+                <div class="chapterPage">
+
+                    <button class="backButton" id="backButton">
+                        ←
+                    </button>
+
+                    <h1>Chapter One</h1>
+
+                    <div class="scene">
+
+                        <!-- Mektup -->
+
+                        <div class="letter" id="letter">
+
+                            <div class="letterContent">
+
+                                <h2>Chapter One</h2>
+
+                                <p id="letterText">
+
+                                    Sevgili Raziye,
+
+                                    <br><br>
+
+                                    Lorem ipsum dolor sit amet...
+
+                                    <br><br>
+
+                                    Lorem ipsum dolor sit amet...
+
+                                    <br><br>
+
+                                    Lorem ipsum dolor sit amet...
+
+                                    <br><br>
+
+                                    Lorem ipsum dolor sit amet...
+
+                                    <br><br>
+
+                                    Lorem ipsum dolor sit amet...
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Zarf -->
+
+                        <img id="envelope" class="envelope" src="assets/images/envelope_closed.png" alt="Envelope">
+
+                    </div>
+
+                    <p id="tapText">
+
+                        Zarfa dokun...
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+    </div>
+    <div class="hidden" id="developerModal">
+
+        <div class="developerCard">
+
+            <h1>ACCESS GRANTED</h1>
+
+            <p>━━━━━━━━━━━━━━━━━━</p>
+
+            <p><b>Developer</b><br>Berke</p>
+
+            <p><b>Primary User</b><br>Raziye</p>
+
+            <p><b>Codename</b><br>Project R</p>
+
+            <p><b>Status</b><br>❤️ Active</p>
+
+            <p><b>Version</b><br>1.0.0</p>
+
+            <p><b>Started</b><br>13 June 2026</p>
+
+            <br>
+
+            <p><i>
+                    "No matter how many versions<br>
+                    Project R gets,<br><br>
+                    you'll always be version one<br>
+                    of my heart."
+                </i></p>
+
+            <button id="closeDeveloper">
+                Close
+            </button>
+
+
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>
