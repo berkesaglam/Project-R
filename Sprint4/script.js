@@ -1,1393 +1,736 @@
-/* ==========================================
-   PROJECT R
-   Codename: Confidential
-   Version: 1.0
-========================================== */
+const stats = JSON.parse(localStorage.getItem("projectRStats")) || {
 
-:root {
+    visits: 0,
 
-    /* Ana Renkler */
+    chapterReads: 0,
 
-    --background: #0D1117;
-    --surface: #161B22;
-    --primary: #7DD3FC;
-    --text: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --border: rgba(255, 255, 255, 0.08);
+    playlistOpens: 0,
 
-    /* Cam Efekti */
+    memoryOpens: 0,
 
-    --glass: rgba(255, 255, 255, 0.06);
-    --blur: blur(18px);
+    bucketOpens: 0,
 
-    /* Yuvarlak Köşeler */
+    easterEggFound: 0,
 
-    --radius-small: 12px;
-    --radius-medium: 20px;
-    --radius-large: 30px;
+    firstVisit: null,
 
-    /* Gölge */
+    lastVisit: null
 
-    --shadow:
-        0 10px 30px rgba(0, 0, 0, .35);
+};
 
-    /* Animasyon */
+function saveStats() {
 
-    --transition: .35s ease;
+    localStorage.setItem(
+        "projectRStats",
+        JSON.stringify(stats)
+    );
+
+}
+/* ==========================
+   LOADING MESSAGES
+========================== */
+
+const loadingMessages = [
+    "Anılar yükleniyor...",
+    "Playlist hazırlanıyor...",
+    "Chapter One açılıyor...",
+    "Bugünün mesajı seçiliyor...",
+    "Özel içerikler hazırlanıyor...",
+    "Güzel anılar hatırlanıyor...",
+    "Müzikler hazırlanıyor...",
+    "Project R başlatılıyor..."
+];
+
+const loadingText = document.getElementById("loadingText");
+loadingText.textContent =
+    loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+
+/* ==========================
+   SCREENS
+========================== */
+
+const splashScreen = document.getElementById("splashScreen");
+const homeScreen = document.getElementById("homeScreen");
+const chapterScreen = document.getElementById("chapterScreen");
+
+/* ==========================
+   SPLASH
+========================== */
+
+// App started
+stats.visits++;
+
+if (!stats.firstVisit) {
+    stats.firstVisit = Date.now();
+}
+
+stats.lastVisit = Date.now();
+
+saveStats();
+
+setTimeout(() => {
+
+    splashScreen.classList.add("hidden");
+    homeScreen.classList.remove("hidden");
+
+}, 3000);
+
+/* ==========================
+   GREETING
+========================== */
+
+const greeting = document.getElementById("greeting");
+const hour = new Date().getHours();
+
+if (hour >= 5 && hour < 12) {
+
+    greeting.innerHTML = "☀️ Günaydın";
+
+} else if (hour >= 12 && hour < 18) {
+
+    greeting.innerHTML = "🌤️ İyi Günler";
+
+} else if (hour >= 18 && hour < 22) {
+
+    greeting.innerHTML = "🌇 İyi Akşamlar";
+
+} else {
+
+    greeting.innerHTML = "🌙 İyi Geceler";
+
+}
+const nicknames = [
+
+    "Raziye ❤️",
+
+    "Aşkım ❤️",
+
+    "Güzelim 🌸",
+
+    "Çiçeğim 🌷",
+
+    "Hayatım 💙",
+
+    "Bir Tanem ✨",
+
+    "Canım 🤍",
+
+    "Balım 🍯",
+
+    "Yavrum 🥹",
+
+    "Tatlım ☀️",
+
+    "Prensesim 👑",
+
+    "Ruh Eşim 🌙"
+
+];
+
+const nickname = document.getElementById("nickname");
+
+let lastNickname = localStorage.getItem("lastNickname");
+
+let randomNickname;
+
+do {
+
+    randomNickname = nicknames[Math.floor(Math.random() * nicknames.length)];
+
+} while (randomNickname === lastNickname && nicknames.length > 1);
+
+nickname.textContent = randomNickname;
+
+localStorage.setItem("lastNickname", randomNickname);
+
+/* ==========================
+   LOVE COUNTER
+========================== */
+
+const loveCounter = document.getElementById("loveCounter");
+
+// İlişkinin başlangıcı
+const startDate = new Date("2026-06-13T17:12:00");
+
+const totalDays = Math.floor(
+    (new Date() - startDate) / (1000 * 60 * 60 * 24)
+);
+
+function updateLoveCounter() {
+
+    const now = new Date();
+
+    let diff = now - startDate;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    diff %= (1000 * 60 * 60 * 24);
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    diff %= (1000 * 60 * 60);
+
+    const minutes = Math.floor(diff / (1000 * 60));
+    diff %= (1000 * 60);
+
+    const seconds = Math.floor(diff / 1000);
+
+    loveCounter.innerHTML =
+        `❤️ ${days}g • ${hours}sa • ${minutes}dk • ${seconds}sn`;
 
 }
 
-/* RESET */
+updateLoveCounter();
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+setInterval(updateLoveCounter, 1000);
 
-body {
+/* ==========================
+   CARD ANIMATION
+========================== */
 
-    background: var(--background);
+const cards = document.querySelectorAll(".card");
 
-    color: var(--text);
+cards.forEach((card, index) => {
 
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
+    setTimeout(() => {
 
-    min-height: 100vh;
+        card.classList.add("show");
 
-}
+    }, index * 150);
 
-.app {
+});
 
-    width: 100%;
-    min-height: 100vh;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-}
-
-.phone {
-
-    width: 390px;
-    height: 844px;
-
-    background: var(--surface);
-
-    border-radius: 35px;
-
-    border: 1px solid var(--border);
-
-    box-shadow: var(--shadow);
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-}
-
-/* ==========================================
-   SPLASH SCREEN
-========================================== */
-
-.splash {
-
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    flex-direction: column;
-
-    justify-content: center;
-    align-items: center;
-
-    text-align: center;
-
-    padding: 40px;
-
-}
-
-.logo {
-
-    width: 90px;
-    height: 90px;
-
-    border-radius: 24px;
-
-    background: #000;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 42px;
-    font-weight: 700;
-
-    color: white;
-
-    margin-bottom: 35px;
-
-}
-
-.splash h1 {
-
-    font-size: 34px;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 10px;
-
-}
-
-.codename {
-
-    color: var(--primary);
-
-    letter-spacing: 4px;
-
-    font-size: 18px;
-
-}
-
-.userBox {
-
-    margin-top: 70px;
-
-}
-
-.userBox span {
-
-    color: var(--text-secondary);
-
-    font-size: 14px;
-
-}
-
-.userBox h2 {
-
-    margin-top: 8px;
-
-    font-size: 28px;
-
-    font-weight: 600;
-
-}
-
-.loadingText {
-
-    margin-top: 90px;
-
-    color: var(--text-secondary);
-
-    font-size: 16px;
-
-}
-
-@keyframes breathe {
-
-    0% {
-
-        transform: scale(1);
-        box-shadow: 0 0 0 rgba(125, 211, 252, 0);
-
-    }
-
-    50% {
-
-        transform: scale(1.06);
-        box-shadow: 0 0 35px rgba(125, 211, 252, .18);
-
-    }
-
-    100% {
-
-        transform: scale(1);
-        box-shadow: 0 0 0 rgba(125, 211, 252, 0);
-
-    }
-
-}
-
-.logo {
-
-    animation: breathe 3s ease-in-out infinite;
-
-}
-
-.loadingText {
-
-    margin-top: 90px;
-
-    color: var(--text-secondary);
-
-    font-size: 16px;
-
-    animation: fadeText 2s infinite;
-
-}
-
-@keyframes fadeText {
-
-    0% {
-
-        opacity: .35;
-
-    }
-
-    50% {
-
-        opacity: 1;
-
-    }
-
-    100% {
-
-        opacity: .35;
-
-    }
-
-}
-
-.screen {
-
-    width: 100%;
-    height: 100%;
-
-}
-
-.hidden {
-
-    display: none;
-
-}
-
-.home {
-
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    align-items: center;
-
-    text-align: center;
-
-}
-
-.home h1 {
-
-    font-size: 32px;
-
-}
-
-.home h2 {
-
-    margin-top: 15px;
-
-    color: var(--primary);
-
-}
-
-.home p {
-
-    margin-top: 25px;
-
-    color: var(--text-secondary);
-
-}
-
-.home{
-
-    width:100%;
-    height:100%;
-
-    display:flex;
-    flex-direction:column;
-
-    padding:30px 25px;
-
-    overflow-y:auto;
-
-}
-
-
-.welcome {
-
-    margin-bottom: 20px;
-
-}
-
-.welcome h1 {
-
-    font-size: 36px;
-
-}
-
-.welcome h2 {
-
-    margin-top: 10px;
-
-    color: var(--primary);
-
-    font-size: 28px;
-
-}
-
-.counterCard{
-
-    background:var(--glass);
-
-    backdrop-filter:var(--blur);
-
-    border:1px solid var(--border);
-
-    border-radius:20px;
-
-    padding:18px;
-
-    margin-bottom:25px;
-
-    text-align:center;
-
-    font-size:20px;
-
-    font-weight:600;
-
-    letter-spacing:.4px;
-
-}
-
-.menu {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 14px;
-
-}
-
-.card {
-
-    background: var(--glass);
-
-    backdrop-filter: var(--blur);
-
-    border: 1px solid var(--border);
-
-    border-radius: 16px;
-
-    padding: 16px;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    cursor: pointer;
-
-    transition: all .35s ease;
-
-}
-
-.card:hover {
-
-    transform: translateY(-5px);
-
-    border-color: var(--primary);
-
-}
-
-.card h3 {
-
-    margin-bottom: 8px;
-
-    font-size: 22px;
-
-}
-
-.card p {
-
-    color: var(--text-secondary);
-
-}
-
-.card {
-
-    opacity: 0;
-
-    transform: translateY(25px);
-
-}
-
-.card.show {
-
-    opacity: 1;
-
-    transform: translateY(0);
-
-    transition:
-        opacity .5s ease,
-        transform .5s ease;
-
-}
-
-.card:active {
-
-    transform: scale(.97);
-
-}
+/* ==========================
+   PAGE NAVIGATION
+========================== */
 
 /* ==========================
    CHAPTER ONE
 ========================== */
 
-.letterPage {
+const chapterCard = document.getElementById("chapterCard");
 
-    width: 100%;
-    height: 100%;
+const closeLetter = document.getElementById("closeLetter");
 
-    display: flex;
+const envelope = document.getElementById("envelope");
+const letter = document.getElementById("letter");
+const tapText = document.getElementById("tapText");
 
-    flex-direction: column;
+let opened = false;
 
-    justify-content: center;
+/* Home -> Chapter */
 
-    align-items: center;
+chapterCard.onclick = () => {
 
-    gap: 25px;
+    homeScreen.classList.add("hidden");
+    chapterScreen.classList.remove("hidden");
+
+    if (localStorage.getItem("chapterOneRead")) {
+
+        tapText.textContent = "Read again ❤️";
+
+    } else {
+
+        tapText.textContent = "Tap the envelope";
+
+    }
+
+};
+
+/* Envelope */
+
+envelope.onclick = () => {
+
+
+    if (opened) return;
+
+    stats.chapterReads++;
+
+    saveStats();
+
+    opened = true;
+
+
+    localStorage.setItem("chapterOneRead", "true");
+
+    tapText.style.opacity = "0";
+
+    /* Açık zarf */
+
+    envelope.src = "assets/images/envelope_open.png";
+
+    /* Kağıt çıksın */
+
+    setTimeout(() => {
+
+        letter.classList.add("show");
+
+    }, 350);
+
+    /* Zarf kaybolsun */
+
+    setTimeout(() => {
+
+        envelope.classList.add("hide");
+
+    }, 900);
+
+    /* Blur + büyüme */
+
+    setTimeout(() => {
+
+        document.body.classList.add("blur");
+
+        letter.classList.add("fullscreen");
+
+    }, 1200);
+
+};
+
+/* Geri */
+
+backButton.onclick = () => {
+
+    if (!opened) {
+
+        chapterScreen.classList.add("hidden");
+        homeScreen.classList.remove("hidden");
+        return;
+
+    }
+
+    /* Blur kalk */
+
+    document.body.classList.remove("blur");
+
+    /* Kağıt küçül */
+
+    letter.classList.remove("fullscreen");
+
+    setTimeout(() => {
+
+        /* Zarf geri gelsin */
+
+        envelope.classList.remove("hide");
+
+        envelope.src = "assets/images/envelope_open.png";
+
+        /* Kağıt aşağı insin */
+
+        letter.classList.remove("show");
+
+    }, 500);
+
+    setTimeout(() => {
+
+        /* Zarf kapansın */
+
+        envelope.src = "assets/images/envelope_closed.png";
+
+    }, 1000);
+
+    setTimeout(() => {
+
+        tapText.style.opacity = "1";
+
+        opened = false;
+
+        chapterScreen.classList.add("hidden");
+        homeScreen.classList.remove("hidden");
+
+    }, 1400);
+
+};
+const playlistCard = document.getElementById("playlistCard");
+const playlistScreen = document.getElementById("playlistScreen");
+const playlistBack = document.getElementById("playlistBack");
+
+const hosPlaylist = document.getElementById("hosPlaylist");
+const mePlaylist = document.getElementById("mePlaylist");
+playlistCard.onclick = () => {
+
+    homeScreen.classList.add("hidden");
+
+    playlistScreen.classList.remove("hidden");
+
+}
+playlistBack.onclick = () => {
+
+    playlistScreen.classList.add("hidden");
+
+    homeScreen.classList.remove("hidden");
+
+}
+hosPlaylist.onclick = () => {
+    stats.playlistOpens++;
+
+    saveStats();
+
+    hosPlaylist.style.transform = "scale(.96)";
+
+    setTimeout(() => {
+
+        window.open(
+            "https://music.youtube.com/playlist?list=PLTK7rWp4bSWVNkBXRlWXfDOkDoyeryGvH",
+            "_blank"
+        );
+
+        hosPlaylist.style.transform = "scale(1)";
+
+    }, 250);
+
+}
+mePlaylist.onclick = () => {
+
+    mePlaylist.style.transform = "scale(.96)";
+
+    setTimeout(() => {
+
+        window.open(
+            "https://music.youtube.com/playlist?list=PL9oQ3ZnU-hYfq6x6Ooqv3gujQDhEYvB8O",
+            "_blank"
+        );
+
+        mePlaylist.style.transform = "scale(1)";
+
+    }, 250);
+
+}
+const bucketCard = document.getElementById("bucketCard");
+const bucketScreen = document.getElementById("bucketScreen");
+const bucketBack = document.getElementById("bucketBack");
+const bucketList = document.getElementById("bucketList");
+
+const bucketItems = [
+
+    { text: "İlk kahvemiz", done: true },
+
+    { text: "İlk ay dönümümüz", done: false },
+
+    { text: "Birlikte gün doğumu izlemek", done: false },
+
+    { text: "Aynı şehirde yaşamak", done: false },
+
+    { text: "Beraber tatile gitmek", done: false },
+
+    { text: "Birlikte konsere gitmek", done: false },
+
+    { text: "İlk evimiz", done: false },
+
+    { text: "Dünyayı birlikte gezmek", done: false }
+
+];
+
+bucketItems.forEach(item => {
+
+    const div = document.createElement("div");
+
+    div.className = "bucketItem";
+
+    if (item.done) {
+
+        div.innerHTML = `
+            <span class="bucketIcon">☑</span>
+            <span class="bucketDone">${item.text}</span>
+        `;
+
+    } else {
+
+        div.innerHTML = `
+            <span class="bucketIcon">☐</span>
+            <span>${item.text}</span>
+        `;
+
+    }
+
+    bucketList.appendChild(div);
+
+});
+
+bucketCard.onclick = () => {
+    stats.bucketOpens++;
+
+    saveStats();
+
+    homeScreen.classList.add("hidden");
+
+    bucketScreen.classList.remove("hidden");
 
 }
 
-.letterPage h1 {
+bucketBack.onclick = () => {
 
-    font-size: 34px;
+    bucketScreen.classList.add("hidden");
 
-}
-
-.letterPage p {
-
-    color: var(--text-secondary);
+    homeScreen.classList.remove("hidden");
 
 }
 
-#backButton {
+const memoryCard = document.getElementById("memoryCard");
 
-    position: absolute;
+const memoryScreen = document.getElementById("memoryScreen");
 
-    top: 35px;
+const memoryBack = document.getElementById("memoryBack");
 
-    left: 25px;
+memoryCard.onclick = () => {
+    stats.memoryOpens++;
 
-    width: 45px;
+    saveStats();
 
-    height: 45px;
+    homeScreen.classList.add("hidden");
 
-    border: none;
-
-    border-radius: 50%;
-
-    cursor: pointer;
-
-    font-size: 22px;
-
-    color: white;
-
-    background: var(--glass);
+    memoryScreen.classList.remove("hidden");
 
 }
 
-/* ==========================
-   ENVELOPE
-========================== */
+memoryBack.onclick = () => {
 
-/* =====================================================
-   CHAPTER ONE
-===================================================== */
+    memoryScreen.classList.add("hidden");
 
-.chapterPage{
-
-    width:100%;
-    height:100%;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-
-    padding-top:40px;
-
-    position:relative;
+    homeScreen.classList.remove("hidden");
 
 }
 
-.chapterPage h1{
+const dailyNote = document.getElementById("dailyNote");
 
-    font-size:38px;
-    margin-bottom:40px;
+const notes = [
 
-}
+    "Bugün de aklımdasın. ❤️",
 
-.backButton{
+    "Gülüşün bütün günümü güzelleştiriyor.",
 
-    position:fixed;
+    "İyi ki varsın.",
 
-    top:20px;
-    left:20px;
+    "Sesini duymak bile yetiyor.",
 
-    width:46px;
-    height:46px;
+    "Her geçen gün seni daha çok seviyorum.",
 
-    border:none;
-    border-radius:50%;
+    "Seninle konuştuğum her dakika en sevdiğim an oluyor.",
 
-    background:rgba(15,23,42,.75);
+    "Birlikte yaşayacağımız günleri sabırsızlıkla bekliyorum.",
 
-    color:#fff;
+    "Umarım bugün yüzünden gülümseme eksik olmaz.",
 
-    font-size:24px;
-    font-weight:600;
+    "Bugün kendine iyi davran. ❤️",
 
-    cursor:pointer;
+    "Sen mutluysan ben de mutluyum."
 
-    backdrop-filter:blur(12px);
+];
+const specialMessages = {
 
-    box-shadow:0 8px 25px rgba(0,0,0,.35);
+    "14-2": "💘 Mutlu Sevgililer Günü sevgilim. Seni çok seviyorum. ❤️",
 
-    z-index:2000;
+    "20-6": "🎂 İyi ki doğdun sevgilim. Hayatımın en güzel insanı iyi ki doğmuş. ❤️",
 
-    transition:.25s;
+    "25-3": "🎂 Bugün benim doğum günüm ama en güzel hediyem yine sensin. ❤️",
 
-}
+    "13-6": "🎉 Bugün hikâyemizin yıl dönümü. İyi ki o gün 'biz' olduk.",
 
-.backButton:hover{
+    "24-12": "🎄 Seninle yeni bir yıla gireceğim için çok mutluyum.",
 
-    background:rgba(30,41,59,.9);
+    "31-12": "🎆 Bu yılın en güzel anıları seninleydi.",
 
-    transform:scale(1.08);
+    "1-1": "🎊 Yeni yılda da ilk dileğim yine sensin."
 
-}
+};
 
-.backButton:active{
+const milestoneMessages = {
 
-    transform:scale(.95);
+    30: "🌱 Bugün birlikte 30 günü geride bıraktık. ❤️",
 
-}
+    50: "⭐ 50 gün... Daha nice günlere.",
 
-.scene{
+    100: "💯 Tam 100 gündür birlikteyiz. Her gününe değer. ❤️",
 
-    position:relative;
+    180: "🌹 Yarım yılı birlikte geride bıraktık.",
 
-    width:260px;
-    height:320px;
+    365: "🎉 Bugün bir yılımız doldu. Seni çok seviyorum.",
 
-}
+    500: "💖 500 gün... Hikâyemiz daha yeni başlıyor.",
 
-/* ======================
-      LETTER
-====================== */
+    730: "✨ İkinci yılımız kutlu olsun sevgilim.",
 
-.letter{
+    1000: "💎 Bin gün... Kelimeler yetmiyor."
 
-    position:absolute;
+};
 
-    left:50%;
-    bottom:0;
+const now = new Date();
 
-    width:190px;
-    height:250px;
+const day = now.getDate();
 
-    transform:translateX(-50%) translateY(70px);
+const month = now.getMonth() + 1;
 
-    background:#f8f5ee;
+const key = `${day}-${month}`;
 
-    border-radius:18px;
+/* Önce özel gün */
 
-    box-shadow:0 18px 45px rgba(0,0,0,.35);
+if (specialMessages[key]) {
 
-    overflow:hidden;
-
-    opacity:0;
-
-    z-index:1;
-
-    transition:
-
-        transform .8s ease,
-
-        opacity .8s ease,
-
-        width .8s ease,
-
-        height .8s ease,
-
-        border-radius .8s ease;
+    dailyNote.textContent = specialMessages[key];
 
 }
 
-/* kağıt çıktı */
+/* Sonra kilometre taşı */
 
-.letter.show{
+else if (milestoneMessages[totalDays]) {
 
-    transform:translateX(-50%) translateY(-80px);
-
-    opacity:1;
+    dailyNote.textContent = milestoneMessages[totalDays];
 
 }
 
-/* tam ekran */
+/* Her ayın 13'ü */
 
-.letter.fullscreen{
+else if (day === 13) {
 
-    position:fixed;
+    const monthsTogether =
 
-    left:50%;
-    top:50%;
+        (now.getFullYear() - 2026) * 12 +
 
-    transform:translate(-50%,-50%);
+        (month - 6) + 1;
 
-    width:320px;
+    dailyNote.textContent =
 
-    height:700px;
-
-    border-radius:26px;
-
-    z-index:999;
+        `❤️ Bugün ${monthsTogether}. ayımız. İyi ki varsın.`;
 
 }
 
-/* ======================
-      CONTENT
-====================== */
+/* Normal mesaj */
 
-.letterContent{
+else {
 
-    width:100%;
-    height:100%;
+    dailyNote.textContent =
 
-    overflow-y:auto;
-
-    padding:35px;
-
-    color:#303030;
-
-    line-height:2;
-
-    scrollbar-width:none;
-
-}
-
-
-.letterContent h2{
-
-    margin-bottom:25px;
-
-    font-size:42px;
-
-}
-
-.letterContent p{
-
-    color:#555;
-
-    font-size:18px;
-
-}
-
-/* ======================
-      ENVELOPE
-====================== */
-
-.envelope{
-
-    position:absolute;
-
-    left:50%;
-    bottom:0;
-
-    width:240px;
-
-    transform:translateX(-50%);
-
-    cursor:pointer;
-
-    z-index:5;
-
-    transition:
-
-        transform .8s ease,
-
-        opacity .6s ease;
-
-}
-
-/* aşağı kaybol */
-
-.envelope.hide{
-
-    transform:
-
-        translateX(-50%)
-
-        translateY(170px);
-
-    opacity:0;
-
-}
-
-/* ======================
-      TAP TEXT
-====================== */
-
-#tapText{
-
-    margin-top:30px;
-
-    color:#8fa6d5;
-
-    transition:.3s;
-
-}
-
-/* ======================
-      OVERLAY
-====================== */
-
-body.blur::before{
-
-    content:"";
-
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(0,0,0,.45);
-
-    backdrop-filter:blur(12px);
-
-    z-index:900;
-
-}
-.playlistGrid{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:22px;
-
-    margin-top:45px;
-
-}
-
-.playlistCard{
-
-    width:145px;
-
-    cursor:pointer;
-
-    text-align:center;
-
-    transition:.25s;
-
-}
-
-.playlistCard:hover{
-
-    transform:scale(1.03);
-
-}
-
-.playlistCard:active{
-
-    transform:scale(.97);
-
-}
-
-.playlistCover{
-
-    width:145px;
-
-    height:145px;
-
-    border-radius:22px;
-
-    object-fit:cover;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.35);
-
-}
-
-.playlistCard h2{
-
-    margin-top:14px;
-
-    font-size:22px;
-
-}
-
-.playlistCard p{
-
-    margin-top:8px;
-
-    color:#94A3B8;
-
-    font-size:14px;
-
-}
-.playlistCover{
-    transition: .3s;
-}
-
-.playlistCover:hover{
-    transform: translateY(-4px);
-    box-shadow: 0 18px 35px rgba(0,0,0,.35);
-}
-/* ==========================
-   PLAYLIST PAGE
-========================== */
-
-.playlistPage{
-
-    width:100%;
-    height:100%;
-
-    display:flex;
-    flex-direction:column;
-
-    align-items:center;
-
-    padding:40px 20px;
-
-}
-
-/* ==========================
-   PLAYLIST HEADER
-========================== */
-
-.playlistHeader{
-
-    position:relative;
-
-    width:100%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    margin-bottom:50px;
-
-}
-
-.playlistHeader h1{
-
-    margin:0;
-
-    font-size:36px;
-
-}
-
-.playlistHeader .backButton{
-
-    position:absolute;
-
-    left:0;
-
-}
-/* ==========================
-   BUCKET LIST
-========================== */
-
-.bucketPage{
-
-    width:100%;
-    height:100%;
-
-    display:flex;
-    flex-direction:column;
-
-    align-items:center;
-
-    padding:40px 22px;
-
-}
-
-.bucketHeader{
-
-    position:relative;
-
-    width:100%;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    margin-bottom:10px;
-
-}
-
-.bucketHeader .backButton{
-
-    position:absolute;
-
-    left:0;
-
-}
-
-.bucketHeader h1{
-
-    margin:0;
-
-    font-size:36px;
-
-}
-
-.bucketSubtitle{
-
-    color:#94A3B8;
-
-    margin-bottom:35px;
-
-}
-
-#bucketList{
-
-    width:100%;
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:12px;
-
-}
-
-.bucketItem{
-
-    background:rgba(255,255,255,.05);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    border-radius:18px;
-
-    padding:18px 20px;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:14px;
-
-    transition:.25s;
-
-}
-
-.bucketItem:hover{
-
-    transform:translateY(-2px);
-
-    background:rgba(255,255,255,.08);
-
-}
-
-.bucketIcon{
-
-    font-size:22px;
-
-}
-
-.bucketDone{
-
-    opacity:.65;
-
-    text-decoration:line-through;
-
-}
-/* ==========================
-   MEMORY BOX
-========================== */
-
-.memoryPage{
-
-    width:100%;
-    height:100%;
-
-    padding:40px 24px;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-
-}
-
-.memoryHeader{
-
-    width:100%;
-
-    position:relative;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-}
-
-.memoryHeader .backButton{
-
-    position:absolute;
-
-    left:0;
-
-}
-
-.memoryHeader h1{
-
-    font-size:38px;
-
-}
-
-.memorySubtitle{
-
-    margin-top:18px;
-
-    color:#94A3B8;
-
-    text-align:center;
-
-    line-height:1.7;
-
-}
-
-.memoryGrid{
-
-    margin-top:40px;
-
-    width:100%;
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:18px;
-
-}
-
-.memoryPhoto{
-
-    height:155px;
-
-    border-radius:24px;
-
-    border:2px dashed rgba(255,255,255,.12);
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:48px;
-
-    color:#6d7d95;
-
-    transition:.25s;
-
-}
-
-.memoryPhoto:hover{
-
-    transform:translateY(-3px);
-
-    border-color:#7DD3FC;
-
-}
-
-.memoryInfo{
-
-    margin-top:35px;
-
-    width:100%;
-
-    padding:28px;
-
-    border-radius:24px;
-
-    background:rgba(255,255,255,.05);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    text-align:center;
-
-}
-
-.memoryInfo .heart{
-
-    font-size:34px;
-
-    margin-bottom:12px;
-
-}
-
-.memoryInfo h2{
-
-    margin-bottom:12px;
-
-}
-
-.memoryInfo p{
-
-    color:#94A3B8;
-
-    line-height:1.8;
-
-}
-.footerNote{
-
-    margin-top:18px;
-
-    text-align:center;
-
-    padding-bottom:10px;
-
-}
-
-
-.footerNote h3{
-
-    font-size:18px;
-
-    margin-bottom:10px;
-
-    color:var(--primary);
-
-}
-
-.footerNote p{
-
-    color:#94A3B8;
-
-    font-style:italic;
-
-    font-size:15px;
-
-    line-height:1.6;
+        notes[Math.floor(Math.random() * notes.length)];
 
 }
 /* ==========================
    DEVELOPER MODE
 ========================== */
 
-#developerModal{
+const logo = document.querySelector(".logo");
 
-    position:fixed;
+const developerModal =
+    document.getElementById("developerModal");
 
-    inset:0;
+const closeDeveloper =
+    document.getElementById("closeDeveloper");
 
-    background:rgba(0,0,0,.75);
+let clickCount = 0;
 
-    backdrop-filter:blur(14px);
+logo.addEventListener("click", () => {
 
-    display:flex;
+    clickCount++;
 
-    justify-content:center;
+    if (clickCount === 3) {
 
-    align-items:center;
+        stats.easterEggFound++;
 
-    z-index:9999;
+        saveStats();
 
-}
+        developerModal.classList.remove("hidden");
 
-#developerModal.hidden{
+        clickCount = 0;
 
-    display:none;
+    }
 
-}
+});
 
-.developerCard{
+closeDeveloper.onclick = () => {
 
-    width:320px;
+    developerModal.classList.add("hidden");
 
-    max-width:90%;
+};
+/*==========================
+   DEVELOPER UTILITIES
+==========================*/
+window.projectR = {
 
-    max-height:80vh;
+    stats,
 
-    overflow-y:auto;
+    resetStats() {
 
-    background:#111821;
+        localStorage.removeItem("projectRStats");
 
-    border:1px solid rgba(125,211,252,.25);
+        location.reload();
 
-    border-radius:24px;
+    },
 
-    padding:30px;
+    showStats() {
 
-    text-align:center;
+        console.table(stats);
 
-    color:white;
+    }
 
-    box-shadow:0 20px 60px rgba(0,0,0,.45);
+};
 
-}
+const milestoneModal = document.getElementById("milestoneModal");
 
-.developerCard h1{
+const milestoneTitle = document.getElementById("milestoneTitle");
 
-    color:#7DD3FC;
+const milestoneMessage = document.getElementById("milestoneMessage");
 
-    margin-bottom:20px;
+const milestones = {
 
-    letter-spacing:2px;
+    1:{
+        title:"❤️ Hoş Geldin",
+        message:"Project R'ye ilk girişin.\nUmarım her ziyaretin güzel bir anıya dönüşür."
+    },
 
-}
+    5:{
+        title:"🌸 5. Ziyaret",
+        message:"Sanırım burayı sevmeye başladın."
+    },
 
-.developerCard p{
+    10:{
+        title:"✨ 10. Ziyaret",
+        message:"Bu hikâyenin bir parçası olduğun için teşekkür ederim."
+    },
 
-    margin:12px 0;
+    25:{
+        title:"💙 25. Ziyaret",
+        message:"Artık Project R küçük bir alışkanlık oldu."
+    },
 
-    line-height:1.7;
+    50:{
+        title:"🎉 50. Ziyaret",
+        message:"Yarım yüze ulaştık.\nDaha nice anılara..."
+    },
 
-}
+    100:{
+        title:"👑 100. Ziyaret",
+        message:"Bunu gerçekten beklemiyordum.\nİyi ki varsın."
+    }
 
-#closeDeveloper{
+};
 
-    margin-top:30px;
+function checkMilestone(){
 
-    width:100%;
+    const visit = stats.visits;
 
-    padding:14px;
+    const shown = JSON.parse(localStorage.getItem("shownMilestones") || "[]");
 
-    border:none;
+    if(milestones[visit] && !shown.includes(visit)){
 
-    border-radius:14px;
+        milestoneTitle.textContent = milestones[visit].title;
 
-    cursor:pointer;
+        milestoneMessage.innerHTML = milestones[visit].message.replace(/\n/g,"<br>");
 
-    background:#7DD3FC;
+        milestoneModal.classList.remove("hidden");
 
-    color:#111;
+        shown.push(visit);
 
-    font-weight:700;
+        localStorage.setItem("shownMilestones",JSON.stringify(shown));
 
-    transition:.25s;
-
-}
-
-#closeDeveloper:hover{
-
-    transform:scale(1.03);
-
-}
-.playlistQuote{
-
-    margin-top:6px;
-    font-size:12px;
-    color:#94A3B8;
-    opacity:.7;
-    font-style:italic;
-
-}
-
-.playlistQuote{
-
-    display:block;
-
-    margin-top:6px;
-
-    font-size:12px;
-
-    color:#94A3B8;
-
-    opacity:.75;
-
-    font-style:italic;
-
-    line-height:1.4;
+    }
 
 }
 
-#milestoneModal{
+milestoneModal.onclick = ()=>{
 
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(0,0,0,.65);
-
-    backdrop-filter:blur(8px);
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    z-index:3000;
+    milestoneModal.classList.add("hidden");
 
 }
 
-#milestoneModal.hidden{
 
-    display:none;
 
-}
+saveStats();
 
-.milestoneCard{
-
-    width:300px;
-
-    padding:28px;
-
-    border-radius:22px;
-
-    background:#111827;
-
-    color:white;
-
-    text-align:center;
-
-    box-shadow:0 20px 50px rgba(0,0,0,.4);
-
-    animation:fadeIn .35s;
-
-}
-
-.milestoneCard h1{
-
-    margin-bottom:15px;
-
-}
-
-.milestoneCard p{
-
-    line-height:1.6;
-
-}
-
-.milestoneCard span{
-
-    display:block;
-
-    margin-top:25px;
-
-    opacity:.6;
-
-    font-size:14px;
-
-}
-
+checkMilestone();
