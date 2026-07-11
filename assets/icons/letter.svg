@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="140" viewBox="0 0 180 140">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ececec"/>
+    </linearGradient>
+
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="8"
+      flood-color="#000000" flood-opacity=".35"/>
+    </filter>
+  </defs>
+
+  <rect
+    x="15"
+    y="25"
+    width="150"
+    height="95"
+    rx="10"
+    fill="url(#paper)"
+    filter="url(#shadow)"
+  />
+
+  <path
+    d="M15 35 L90 85 L165 35"
+    fill="none"
+    stroke="#d6d6d6"
+    stroke-width="3"
+  />
+
+  <path
+    d="M15 120 L65 70"
+    fill="none"
+    stroke="#d6d6d6"
+    stroke-width="3"
+  />
+
+  <path
+    d="M165 120 L115 70"
+    fill="none"
+    stroke="#d6d6d6"
+    stroke-width="3"
+  />
+
+  <circle
+    cx="90"
+    cy="72"
+    r="18"
+    fill="#ff4d73"
+  />
+
+  <text
+    x="90"
+    y="79"
+    font-size="18"
+    text-anchor="middle"
+    fill="white">
+❤
+  </text>
+</svg>
