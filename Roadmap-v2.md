@@ -111,6 +111,21 @@ Turn Project R into a shared, secure, mobile-friendly couple app with synchroniz
 - [ ] Review security and error handling
 - [ ] Document the release
 
+## Architecture and Security Decisions
+
+- Frontend: Existing HTML, CSS and JavaScript.
+- Backend: Supabase.
+- Database: PostgreSQL managed by Supabase.
+- Authentication: Separate accounts for both users.
+- Shared data: Access restricted to the authorized couple.
+- Database security: Row Level Security (RLS) policies.
+- Photo storage: Private Supabase Storage bucket named `couple-photos`.
+- Synchronization: Supabase Realtime where appropriate.
+- Secrets: Secret and service-role keys must never be exposed in frontend code or committed to Git.
+- Relationship counter: Only Berke may pause or resume it; authorization must be enforced server-side.
+- Stable release: Keep `main` reserved for the stable v1.0 release.
+
+
 ## Rules
 - Keep `main` reserved for stable releases.
 - Develop v2.0 on `develop-v2.0`.
