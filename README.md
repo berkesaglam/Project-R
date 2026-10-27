@@ -1,29 +1,40 @@
-<<<<<<< HEAD
 # Project R
 
-Version: v1.0
+A private Progressive Web App created as a digital memory journal for a couple.
 
-Status: In Development
+## Version
 
-Release Target: 13 July 2026
+- Stable version: v1.0
+- Current development: v2.0
 
-Developer: Axelrod
+## Features in v1.0
 
-# ❤️ Project R
+- Interactive letter
+- Playlist links
+- Bucket List
+- Memory gallery
+- Installable Progressive Web App (PWA)
+- LocalStorage persistence
 
-A private Progressive Web App created as a digital memory journal.
+## Planned Features in v2.0
 
-## Features
+- Supabase authentication and database
+- Shared Bucket List
+- Shared Film & Series list
+- Private notes and messages
+- Couple activities and quiz
+- Shared photo album
+- Usage analytics dashboard
+- Night-sky theme
+- Relationship counter controls
 
-- ✉️ Interactive Letter
-- 🎵 Playlist
-- ⭐ Interactive Bucket List
-- 🖼 Memory Gallery
-- 📱 Installable PWA
-- 💾 LocalStorage persistence
-=======
-# Project-R
-Hayatımda hiçbir projeyi yaparken bu kadar heyecan ve istek duymadım.
-İyi ki  benimlesin.
--B
->>>>>>> 538b8803f6e0f5be1dc668fd3a3b547ee670b0bf
+## Technology Stack
+
+- HTML
+- CSS
+- JavaScript
+- Supabase (planned for v2.0)
+
+## Development
+
+Version 2.0 is being developed on the `develop-v2.0` branch. The `main` branch is reserved for the stable version.
