@@ -843,6 +843,8 @@ const milestones = {
 
 };
 
+
+
 function checkMilestone() {
 
     const visit = stats.visits;
@@ -877,5 +879,9 @@ saveStats();
 
 checkMilestone();
 
+console.log(
+    "Project R Supabase:",
+    window.projectRSupabase ? "Başlatıldı" : "Başlatılamadı"
+);
 
 
