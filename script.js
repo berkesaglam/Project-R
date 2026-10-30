@@ -72,18 +72,45 @@ saveStats();
 
 
 
-setTimeout(() => {
+/*setTimeout(() => {
+
+    // splashScreen.classList.add("hidden");
+    // homeScreen.classList.remove("hidden");
+    // console.log(homeScreen.className);
+ 
+     //console.log("Splash classes:", splashScreen.className);
+     //console.log("Home classes:", homeScreen.className);
 
     splashScreen.classList.add("hidden");
+    authScreen.classList.remove("hidden");
+
+
+
+}, 3000);*/
+setTimeout(async () => {
+    const supabase = window.projectRSupabase;
+
+    // Önce tüm ana ekranları gizle.
+    splashScreen.classList.add("hidden");
+    authScreen.classList.add("hidden");
+    homeScreen.classList.add("hidden");
+
+    if (!supabase) {
+        authScreen.classList.remove("hidden");
+        authMessage.textContent = "Sunucu bağlantısı kurulamadı.";
+        return;
+    }
+
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error || !data.session) {
+        authScreen.classList.remove("hidden");
+        return;
+    }
+
     homeScreen.classList.remove("hidden");
-    console.log(homeScreen.className);
-
-    console.log("Splash classes:", splashScreen.className);
-    console.log("Home classes:", homeScreen.className);
-
-
-
 }, 3000);
+
 
 /* ==========================
    GREETING
@@ -111,7 +138,7 @@ if (hour >= 5 && hour < 12) {
 }
 const nicknames = [
 
-    
+
 
     "Aşkım ❤️",
 
@@ -412,190 +439,609 @@ mePlaylist.onclick = () => {
     }, 250);
 
 }
+
+
+
+
 const bucketCard = document.getElementById("bucketCard");
 const bucketScreen = document.getElementById("bucketScreen");
 const bucketBack = document.getElementById("bucketBack");
 const bucketList = document.getElementById("bucketList");
 const bucketInput = document.getElementById("bucketInput");
-
 const addBucketButton = document.getElementById("addBucketButton");
 
 const defaultBucketItems = [
-
-    { text: "İlk ayımız", done: true, completedAt: new Date("2026-07-13").toLocaleDateString("tr-TR"), locked: true },
-
+    {
+        text: "İlk ayımız",
+        done: true,
+        completedAt: new Date("2026-07-13").toLocaleDateString("tr-TR"),
+        locked: true
+    },
     { text: "Sakura zamanı Japonya tatili", done: false, completedAt: null },
-
     { text: "Balkan turu", done: false, completedAt: null },
-
     { text: "Tekrar aynı şehirde yaşamaya başlamak", done: false, completedAt: null },
-
     { text: "Doğu ekspresi turu", done: false, completedAt: null },
-
-    { text: "Birlikte Yalın konsere gitmek", done: false, completedAt: null },
-
-
-
+    { text: "Birlikte Yalın konsere gitmek", done: false, completedAt: null }
 ];
 
-let bucketItems =
-    JSON.parse(localStorage.getItem("bucketItems")) ||
-    defaultBucketItems;
+let bucketItems = [];
+let bucketLoading = false;
+
+function getBucketSupabase() {
+    return window.projectRSupabase;
+}
+
+async function loadBucketItems() {
+    const supabase = getBucketSupabase();
+
+    if (!supabase) {
+        bucketList.textContent = "Sunucu bağlantısı kurulamadı.";
+        return;
+    }
+
+    const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+
+    if (userError || !userData.user) {
+        bucketList.textContent = "Listeyi görmek için giriş yapmalısın.";
+        return;
+    }
+
+    const { data: memberships, error: membershipError } = await supabase
+        .from("couple_members")
+        .select("couple_id")
+        .eq("user_id", userData.user.id)
+        .limit(1);
+
+    if (membershipError || !memberships?.length) {
+        console.error("Çift bilgisi alınamadı:", membershipError);
+        bucketList.textContent = "Henüz bir çifte bağlı değilsin.";
+        return;
+    }
+
+    const coupleId = memberships[0].couple_id;
+
+    const { data, error } = await supabase
+        .from("bucket_items")
+        .select("id, couple_id, created_by, title, is_completed, completed_at, created_at")
+        .eq("couple_id", coupleId)
+        .order("created_at", { ascending: true });
+
+    if (error) {
+        console.error("Bucket List yüklenemedi:", error);
+        bucketList.textContent = "Liste yüklenemedi. Tekrar deneyebilirsin.";
+        return;
+    }
+
+    bucketItems = (data || []).map(item => ({
+        id: item.id,
+        text: item.title,
+        done: item.is_completed,
+        completedAt: item.completed_at
+            ? new Date(item.completed_at).toLocaleDateString("tr-TR")
+            : null,
+        locked: false
+    }));
+
+    // İlk ayımız maddesini mevcut listede yoksa başlangıçta göster.
+    if (!bucketItems.some(item => item.text === "İlk ayımız")) {
+        bucketItems.unshift({
+            text: "İlk ayımız",
+            done: true,
+            completedAt: new Date("2026-07-13").toLocaleDateString("tr-TR"),
+            locked: true
+        });
+    }
+
+    renderBucket();
+}
 
 function renderBucket() {
-
     bucketList.innerHTML = "";
 
     bucketItems.forEach((item, index) => {
-
         const div = document.createElement("div");
-
         div.className = "bucketItem";
 
-        div.innerHTML = `
-            <span class="bucketIcon">
-                ${item.done ? "☑" : "☐"}
-            </span>
+        const icon = document.createElement("span");
+        icon.className = "bucketIcon";
+        icon.textContent = item.done ? "☑" : "☐";
 
-            <div style="flex:1">
+        const content = document.createElement("div");
+        content.style.flex = "1";
 
-                <div class="${item.done ? "bucketDone" : ""}">
-                    ${item.text}
-                </div>
+        const title = document.createElement("div");
+        title.textContent = item.text;
+        if (item.done) title.className = "bucketDone";
 
-                ${item.completedAt
-                ?
-                `<small style="opacity:.6">
-                        ❤️ Gerçekleştirilme Tarihi: ${item.completedAt}
-                    </small>`
-                :
-                ""
+        content.appendChild(title);
+
+        if (item.completedAt) {
+            const date = document.createElement("small");
+            date.style.opacity = "0.6";
+            date.textContent = `❤️ Gerçekleştirilme Tarihi: ${item.completedAt}`;
+            content.appendChild(date);
+        }
+
+        div.append(icon, content);
+
+        div.addEventListener("click", async () => {
+            if (item.locked || bucketLoading) return;
+
+            const supabase = getBucketSupabase();
+            if (!supabase) return;
+
+            bucketLoading = true;
+
+            try {
+                const nextDone = !item.done;
+                const completedAt = nextDone ? new Date().toISOString() : null;
+
+                const { error } = await supabase
+                    .from("bucket_items")
+                    .update({
+                        is_completed: nextDone,
+                        completed_at: completedAt
+                    })
+                    .eq("id", item.id);
+
+                if (error) throw error;
+
+                await loadBucketItems();
+            } catch (error) {
+                console.error("Madde güncellenemedi:", error);
+                alert("Madde güncellenemedi. Tekrar deneyebilirsin.");
+            } finally {
+                bucketLoading = false;
             }
-
-            </div>
-        `;
-
-        div.onclick = () => {
-
-
-
-            if (item.locked) {
-                return;
-            }
-
-            item.done = !item.done;
-
-            if (item.done) {
-
-                item.completedAt =
-                    new Date().toLocaleDateString("tr-TR");
-
-            } else {
-
-                item.completedAt = null;
-
-            }
-
-            localStorage.setItem(
-                "bucketItems",
-                JSON.stringify(bucketItems)
-            );
-
-            renderBucket();
-
-        };
+        });
 
         bucketList.appendChild(div);
-
     });
-
 }
 
-renderBucket();
-addBucketButton.onclick = () => {
-
+addBucketButton.onclick = async () => {
     const text = bucketInput.value.trim();
+    if (!text || bucketLoading) return;
 
-    if (text === "") return;
-
-    bucketItems.push({
-
-        text,
-
-        done: false,
-
-        completedAt: null
-
-    });
-
-    localStorage.setItem(
-
-        "bucketItems",
-
-        JSON.stringify(bucketItems)
-
-    );
-
-    bucketInput.value = "";
-
-    renderBucket();
-
-};
-bucketInput.addEventListener("keydown", (e) => {
-
-    if (e.key === "Enter") {
-
-        addBucketButton.click();
-
+    const supabase = getBucketSupabase();
+    if (!supabase) {
+        alert("Sunucu bağlantısı kurulamadı.");
+        return;
     }
 
+    bucketLoading = true;
+    addBucketButton.disabled = true;
+
+    try {
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError || !userData.user) {
+            throw userError || new Error("Önce giriş yapmalısın.");
+        }
+
+        const { data: memberships, error: membershipError } = await supabase
+            .from("couple_members")
+            .select("couple_id")
+            .eq("user_id", userData.user.id)
+            .limit(1);
+
+        if (membershipError) throw membershipError;
+        if (!memberships?.length) {
+            throw new Error("Henüz bir çifte bağlı değilsin.");
+        }
+
+        const { error } = await supabase
+            .from("bucket_items")
+            .insert({
+                couple_id: memberships[0].couple_id,
+                created_by: userData.user.id,
+                title: text,
+                is_completed: false
+            });
+
+        if (error) throw error;
+
+        bucketInput.value = "";
+        await loadBucketItems();
+    } catch (error) {
+        console.error("Madde eklenemedi:", error);
+        alert(error.message || "Madde eklenemedi.");
+    } finally {
+        bucketLoading = false;
+        addBucketButton.disabled = false;
+    }
+};
+
+bucketInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") addBucketButton.click();
 });
 
-bucketCard.onclick = () => {
+bucketCard.onclick = async () => {
     stats.bucketOpens++;
-
     saveStats();
 
     homeScreen.classList.add("hidden");
-
     bucketScreen.classList.remove("hidden");
 
-
-}
+    await loadBucketItems();
+};
 
 bucketBack.onclick = () => {
-
     bucketScreen.classList.add("hidden");
-
     homeScreen.classList.remove("hidden");
+};
 
+renderBucket();
+// ================================
+// NOTES SYSTEM
+// ================================
+
+const notesCard = document.getElementById("notesCard");
+const notesScreen = document.getElementById("notesScreen");
+const notesBack = document.getElementById("notesBack");
+const noteInput = document.getElementById("noteInput");
+const sendNoteButton = document.getElementById("sendNoteButton");
+const notesContainer = document.getElementById("notesContainer");
+const notesMessage = document.getElementById("notesMessage");
+
+let notesLoading = false;
+
+async function getNotesContext() {
+    const supabase = window.projectRSupabase;
+
+    if (!supabase) {
+        throw new Error("Sunucu bağlantısı kurulamadı.");
+    }
+
+    const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+
+    if (userError) throw userError;
+    if (!userData.user) {
+        throw new Error("Not bırakmak için giriş yapmalısın.");
+    }
+
+    const { data: memberships, error } = await supabase
+        .from("couple_members")
+        .select("couple_id")
+        .eq("user_id", userData.user.id)
+        .limit(1);
+
+    if (error) throw error;
+
+    if (!memberships?.length) {
+        throw new Error("Henüz bir çifte bağlı değilsin.");
+    }
+
+    return {
+        supabase,
+        user: userData.user,
+        coupleId: memberships[0].couple_id
+    };
+}
+async function loadUnreadNoteCount() {
+    const badge = document.getElementById("unreadNotesBadge");
+
+    if (!badge) return;
+
+    try {
+        const { supabase, user, coupleId } = await getNotesContext();
+
+        const { count, error } = await supabase
+            .from("notes")
+            .select("id", { count: "exact", head: true })
+            .eq("couple_id", coupleId)
+            .eq("recipient_id", user.id)
+            .is("read_at", null);
+
+        if (error) throw error;
+
+        badge.textContent = count || 0;
+        badge.classList.toggle("hidden", !count);
+
+    } catch (error) {
+        console.error("Okunmamış not sayısı alınamadı:", error);
+        badge.classList.add("hidden");
+    }
 }
 
+async function loadNotes() {
+    notesContainer.textContent = "Notlar yükleniyor...";
+
+    try {
+        const { supabase, coupleId, user } = await getNotesContext();
+
+        const { data, error } = await supabase
+            .from("notes")
+            .select("*")
+            .eq("couple_id", coupleId)
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        notesContainer.innerHTML = "";
+
+        if (!data?.length) {
+            notesContainer.textContent =
+                "Henüz birbirinize not bırakmamışsınız. ❤️";
+            return;
+        }
+
+        data.forEach(note => {
+            const card = document.createElement("div");
+            card.className = "noteItem";
+
+            const isReceived = note.recipient_id === user.id;
+            const isUnread = isReceived && !note.read_at;
+
+            if (isUnread) {
+                card.classList.add("unreadNote");
+            }
+
+            const heading = document.createElement("strong");
+            heading.textContent = isReceived
+                ? "💌 Sana gelen not"
+                : "❤️ Senin bıraktığın not";
+
+            const message = document.createElement("p");
+            message.textContent = note.content;
+
+            const date = document.createElement("small");
+            date.textContent = new Date(note.created_at)
+                .toLocaleString("tr-TR");
+
+            const status = document.createElement("small");
+
+            if (isReceived) {
+                status.textContent = isUnread
+                    ? "● Okunmadı"
+                    : "✓ Okundu";
+            } else {
+                status.textContent = "Gönderildi";
+            }
+
+            card.append(heading, message, date, status);
+
+            if (isUnread) {
+                card.addEventListener("click", async () => {
+                    try {
+                        const { error } = await supabase
+                            .from("notes")
+                            .update({
+                                read_at: new Date().toISOString()
+                            })
+                            .eq("id", note.id)
+                            .is("read_at", null);
+
+                        if (error) throw error;
+
+                        await loadNotes();
+
+                    } catch (error) {
+                        console.error("Not okundu olarak işaretlenemedi:", error);
+                    }
+                });
+            }
+
+            notesContainer.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Notlar yüklenemedi:", error);
+        notesContainer.textContent =
+            error.message || "Notlar yüklenemedi.";
+    }
+}
+async function getRecipientId(supabase, coupleId, currentUserId) {
+    const { data, error } = await supabase
+        .from("couple_members")
+        .select("user_id")
+        .eq("couple_id", coupleId)
+        .neq("user_id", currentUserId)
+        .limit(1);
+
+    if (error) throw error;
+
+    if (!data?.length) {
+        throw new Error("Henüz diğer kullanıcı hesabı çifte katılmamış.");
+    }
+
+    return data[0].user_id;
+}
+
+sendNoteButton.onclick = async () => {
+    const content = noteInput.value.trim();
+
+    if (!content || notesLoading) return;
+
+    notesLoading = true;
+    sendNoteButton.disabled = true;
+    notesMessage.textContent = "Not gönderiliyor...";
+
+    try {
+        const { supabase, user, coupleId } = await getNotesContext();
+
+        const recipientId = await getRecipientId(
+            supabase,
+            coupleId,
+            user.id
+        );
+
+        const { error } = await supabase
+            .from("notes")
+            .insert({
+                couple_id: coupleId,
+                sender_id: user.id,
+                recipient_id: recipientId,
+                content: content
+            });
+
+        if (error) throw error;
+
+        noteInput.value = "";
+        notesMessage.textContent = "Notun bırakıldı. ❤️";
+
+        await loadNotes();
+
+    } catch (error) {
+        console.error("Not gönderilemedi:", error);
+        notesMessage.textContent = error.message || "Not gönderilemedi.";
+    } finally {
+        notesLoading = false;
+        sendNoteButton.disabled = false;
+    }
+};
+notesCard.onclick = async () => {
+    homeScreen.classList.add("hidden");
+    notesScreen.classList.remove("hidden");
+
+    await loadNotes();
+    await loadUnreadNoteCount();
+};
+
+notesBack.onclick = async () => {
+    notesScreen.classList.add("hidden");
+    homeScreen.classList.remove("hidden");
+
+    await loadUnreadNoteCount();
+};
+
+
 const memoryCard = document.getElementById("memoryCard");
-
 const memoryScreen = document.getElementById("memoryScreen");
-
 const memoryBack = document.getElementById("memoryBack");
 
-memoryCard.onclick = () => {
-    stats.memoryOpens++;
+const memoryPhotoInput = document.getElementById("memoryPhotoInput");
+const memoryGrid = document.getElementById("memoryGrid");
+const memoryMessage = document.getElementById("memoryMessage");
 
+memoryCard.onclick = async () => {
+    stats.memoryOpens++;
     saveStats();
 
     homeScreen.classList.add("hidden");
-
     memoryScreen.classList.remove("hidden");
 
-
-}
+    await loadMemoryPhotos();
+};
 
 memoryBack.onclick = () => {
-
     memoryScreen.classList.add("hidden");
-
     homeScreen.classList.remove("hidden");
+};
 
+async function loadMemoryPhotos() {
+    memoryGrid.textContent = "Anılarımız yükleniyor... 💙";
+
+    try {
+        const { supabase, coupleId } = await getNotesContext();
+
+        const { data, error } = await supabase
+            .from("memory_photos")
+            .select("*")
+            .eq("couple_id", coupleId)
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        memoryGrid.innerHTML = "";
+
+        if (!data || data.length === 0) {
+            memoryGrid.textContent = "Henüz fotoğraf eklenmemiş. 💙";
+            return;
+        }
+
+        for (const photo of data) {
+            const { data: imageData, error: imageError } =
+                await supabase.storage
+                    .from("couple-photos")
+                    .createSignedUrl(photo.storage_path, 3600);
+
+            if (imageError) {
+                console.error("Fotoğraf açılamadı:", imageError);
+                continue;
+            }
+
+            const image = document.createElement("img");
+            image.className = "memoryPhoto";
+            image.src = imageData.signedUrl;
+            image.alt = "Birlikte bir anımız";
+            image.loading = "lazy";
+
+            memoryGrid.appendChild(image);
+        }
+
+        if (!memoryGrid.children.length) {
+            memoryGrid.textContent = "Fotoğraflar görüntülenemedi.";
+        }
+
+    } catch (error) {
+        console.error("Memory Box yüklenemedi:", error);
+        memoryGrid.textContent = error.message || "Fotoğraflar yüklenemedi.";
+    }
 }
+
+memoryPhotoInput.addEventListener("change", async () => {
+    const files = Array.from(memoryPhotoInput.files || []);
+
+    if (!files.length) return;
+
+    memoryMessage.textContent = "";
+
+    try {
+        const { supabase, coupleId, user } = await getNotesContext();
+
+        for (const file of files) {
+            if (!file.type.startsWith("image/")) {
+                throw new Error("Yalnızca fotoğraf dosyaları yükleyebilirsin.");
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                throw new Error("Fotoğraf boyutu 10 MB'ı geçemez.");
+            }
+
+            const extension = file.name.split(".").pop().toLowerCase();
+            const filePath = `${coupleId}/${crypto.randomUUID()}.${extension}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from("couple-photos")
+                .upload(filePath, file, {
+                    contentType: file.type,
+                    upsert: false
+                });
+
+            if (uploadError) throw uploadError;
+
+            const { error: insertError } = await supabase
+                .from("memory_photos")
+                .insert({
+                    couple_id: coupleId,
+                    uploaded_by: user.id,
+                    storage_path: filePath
+                });
+
+            if (insertError) {
+                await supabase.storage
+                    .from("couple-photos")
+                    .remove([filePath]);
+
+                throw insertError;
+            }
+        }
+
+        memoryMessage.textContent = "Fotoğraflarımız eklendi! 💙";
+        await loadMemoryPhotos();
+
+    } catch (error) {
+        console.error("Fotoğraf yüklenemedi:", error);
+        memoryMessage.textContent = error.message || "Fotoğraf yüklenemedi.";
+    } finally {
+        memoryPhotoInput.value = "";
+    }
+});
+
 
 const dailyNote = document.getElementById("dailyNote");
 
@@ -884,4 +1330,131 @@ console.log(
     window.projectRSupabase ? "Başlatıldı" : "Başlatılamadı"
 );
 
+
+/* ==========================
+   SUPABASE AUTHENTICATION
+========================== */
+
+const authScreen = document.getElementById("authScreen");
+const authForm = document.getElementById("authForm");
+const authTitle = document.getElementById("authTitle");
+const authEmail = document.getElementById("authEmail");
+const authPassword = document.getElementById("authPassword");
+const authDisplayName = document.getElementById("authDisplayName");
+const displayNameLabel = document.getElementById("displayNameLabel");
+const authSubmit = document.getElementById("authSubmit");
+const authToggle = document.getElementById("authToggle");
+const authMessage = document.getElementById("authMessage");
+
+let isRegisterMode = false;
+
+authToggle.addEventListener("click", () => {
+    isRegisterMode = !isRegisterMode;
+
+    authTitle.textContent = isRegisterMode ? "Hesap Oluştur" : "Giriş Yap";
+    authSubmit.textContent = isRegisterMode ? "Kayıt Ol" : "Giriş Yap";
+
+    authToggle.textContent = isRegisterMode
+        ? "Zaten hesabın var mı? Giriş yap"
+        : "Hesabın yok mu? Kayıt ol";
+
+    authDisplayName.hidden = !isRegisterMode;
+    displayNameLabel.hidden = !isRegisterMode;
+
+    authDisplayName.required = isRegisterMode;
+    authPassword.autocomplete = isRegisterMode
+        ? "new-password"
+        : "current-password";
+
+    authMessage.textContent = "";
+});
+
+authForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const supabase = window.projectRSupabase;
+
+    if (!supabase) {
+        authMessage.textContent = "Sunucu bağlantısı kurulamadı.";
+        return;
+    }
+
+    const email = authEmail.value.trim();
+    const password = authPassword.value;
+    const displayName = authDisplayName.value.trim();
+
+    authSubmit.disabled = true;
+    authMessage.textContent = "İşlem yapılıyor...";
+
+    try {
+        let result;
+
+        if (isRegisterMode) {
+            result = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        display_name: displayName
+                    }
+                }
+            });
+        } else {
+            result = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+        }
+
+        if (result.error) {
+            throw result.error;
+        }
+
+        if (isRegisterMode && !result.data.session) {
+            authMessage.textContent =
+                "Kayıt oluşturuldu. E-posta doğrulamasını tamamlayıp giriş yap.";
+            return;
+        }
+
+        authMessage.textContent = isRegisterMode
+            ? "Hesap oluşturuldu."
+            : "Giriş başarılı.";
+        if (!isRegisterMode) {
+            authScreen.classList.add("hidden");
+            homeScreen.classList.remove("hidden");
+        }
+
+    } catch (error) {
+        console.error("Kimlik doğrulama hatası:", error);
+
+        authMessage.textContent =
+            error.message || "İşlem sırasında bir hata oluştu.";
+    } finally {
+        authSubmit.disabled = false;
+    }
+});
+/* ==========================
+   SESSION RESTORE
+========================== */
+
+async function restoreSession() {
+    const supabase = window.projectRSupabase;
+
+    if (!supabase) {
+        authMessage.textContent = "Sunucu bağlantısı kurulamadı.";
+        return;
+    }
+
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+        console.error("Oturum kontrolü başarısız:", error.message);
+        return;
+    }
+
+    if (data.session) {
+        authScreen.classList.add("hidden");
+        homeScreen.classList.remove("hidden");
+    }
+}
 

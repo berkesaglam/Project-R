@@ -1,5 +1,5 @@
 window.projectRSupabase = window.supabase.createClient(
-    "https://wehpwlpmngnffarwtiqc.supabase.co/rest/v1/",
+    "https://wehpwlpmngnffarwtiqc.supabase.co",
     "sb_publishable_eCAPNvgQB_1_aW6LQxg3uQ_TwdWSBL3"
 );
 window.projectRSupabase.auth.getSession()

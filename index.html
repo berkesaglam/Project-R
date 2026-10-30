@@ -54,7 +54,42 @@
                 </div>
 
             </div>
+            <!-- Authentication Screen -->
+            <div class="screen hidden" id="authScreen">
+                <div class="splash">
+                    <div class="logo">R</div>
 
+                    <h1>PROJECT R</h1>
+                    <p class="codename">Bizim hikâyemiz.</p>
+
+                    <div class="authForm">
+                        <h2 id="authTitle">Giriş Yap</h2>
+
+                        <form id="authForm">
+                            <label for="authEmail">E-posta</label>
+                            <input type="email" id="authEmail" placeholder="E-posta adresin" autocomplete="email"
+                                required>
+
+                            <label for="authPassword">Şifre</label>
+                            <input type="password" id="authPassword" placeholder="Şifren"
+                                autocomplete="current-password" minlength="6" required>
+
+                            <label for="authDisplayName" id="displayNameLabel" hidden>
+                                Görünen ad
+                            </label>
+                            <input type="text" id="authDisplayName" placeholder="Berke veya Raziye" autocomplete="name"
+                                hidden>
+
+                            <button type="submit" id="authSubmit">Giriş Yap</button>
+                            <p id="authMessage" role="status"></p>
+                        </form>
+
+                        <button type="button" id="authToggle">
+                            Hesabın yok mu? Kayıt ol
+                        </button>
+                    </div>
+                </div>
+            </div>
             <!-- Home Screen -->
 
             <div class="screen hidden" id="homeScreen">
@@ -139,6 +174,17 @@
                             <span>›</span>
 
                         </div>
+                        <div class="card" id="notesCard">
+                            <div>
+                                <h3>💌 Sana Bir Not Bıraktım</h3>
+                                <p>Birbirimize küçük mesajlar</p>
+                            </div>
+
+                            <div class="notesCardRight">
+                                <span id="unreadNotesBadge" class="unreadNotesBadge hidden">0</span>
+                                <span>›</span>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="footerNote">
@@ -149,6 +195,34 @@
 
                 </div>
 
+            </div>
+            <!-- Notes Screen -->
+            <div class="screen hidden" id="notesScreen">
+                <div class="notesPage">
+
+                    <div class="notesHeader">
+                        <button class="backButton" id="notesBack">←</button>
+                        <h1>💌 Notlarımız</h1>
+                    </div>
+
+                    <div class="notesCompose">
+                        <h2>Bir not bırak</h2>
+                        <textarea id="noteInput" placeholder="Aklından geçenleri buraya yaz..." maxlength="1000"
+                            rows="4"></textarea>
+
+                        <button type="button" id="sendNoteButton">
+                            Notu Gönder ❤️
+                        </button>
+
+                        <p id="notesMessage" role="status"></p>
+                    </div>
+
+                    <div class="notesList">
+                        <h2>Bize Bırakılan Notlar</h2>
+                        <div id="notesContainer"></div>
+                    </div>
+
+                </div>
             </div>
             <!-- Playlist Screen -->
 
@@ -221,25 +295,18 @@
                         Hikâyemize şahitlik edecek fotoğraflar burada yerini alacak.
                     </p>
 
-                    <div class="memoryGrid">
-
-                        <div class="memoryPhoto">
-                            <span>🖼️</span>
-                        </div>
-
-                        <div class="memoryPhoto">
-                            <span>🖼️</span>
-                        </div>
-
-                        <div class="memoryPhoto">
-                            <span>🖼️</span>
-                        </div>
-
-                        <div class="memoryPhoto">
-                            <span>🖼️</span>
-                        </div>
-
+                    <div class="memoryActions">
+                        <label for="memoryPhotoInput" class="memoryUploadButton">
+                            <span>＋</span> Fotoğraf Ekle
+                        </label>
+                        <input type="file" id="memoryPhotoInput" accept="image/*" multiple hidden>
                     </div>
+
+                    <div class="memoryGrid" id="memoryGrid">
+                        <p class="memoryEmpty">Anılarımız yükleniyor... 💙</p>
+                    </div>
+
+                    <p id="memoryMessage" role="status"></p>
 
                     <div class="memoryInfo">
 
@@ -329,14 +396,19 @@
 
                                     <br><br>
 
-                                    Bir ay... Şimdiden birinci ayımızı doldurmuşuz. Sanki daha dün tanışmışız gibi geliyor. Gerçi seninleyken zamanın nasıl geçtiğini anlamıyorum.
-                                    Mesela bazen gözlerine baktığım o bir saniyede yaşıyorum; bazense tek bir göz kırpmamla değişiyor günler.
+                                    Bir ay... Şimdiden birinci ayımızı doldurmuşuz. Sanki daha dün tanışmışız gibi
+                                    geliyor. Gerçi seninleyken zamanın nasıl geçtiğini anlamıyorum.
+                                    Mesela bazen gözlerine baktığım o bir saniyede yaşıyorum; bazense tek bir göz
+                                    kırpmamla değişiyor günler.
 
                                     <br><br>
 
-                                    İnan bana başta zorla gittiğim bir seçmeli derste hayatımda gördüğüm en büyük kalpli insanla yolumun kesişeceği aklımın ucundan bile geçmezdi.
-                                    Ama şimdi her gün iyi ki o dersi almışım diyorum. Sadece seni görebilmek için her çarşamba sabah kalkıp okula geliyordum. Orada oturup sevgili
-                                    Hatice hocacığımızın değerli alıştırmalarına katılmak zorunda kalıyordum belki ama seni gördüğüm için her seferinde değdi diyordum kendime.
+                                    İnan bana başta zorla gittiğim bir seçmeli derste hayatımda gördüğüm en büyük kalpli
+                                    insanla yolumun kesişeceği aklımın ucundan bile geçmezdi.
+                                    Ama şimdi her gün iyi ki o dersi almışım diyorum. Sadece seni görebilmek için her
+                                    çarşamba sabah kalkıp okula geliyordum. Orada oturup sevgili
+                                    Hatice hocacığımızın değerli alıştırmalarına katılmak zorunda kalıyordum belki ama
+                                    seni gördüğüm için her seferinde değdi diyordum kendime.
 
                                     <br><br>
 
@@ -345,19 +417,27 @@
                                     sihirli bir değnek varda eksik olduğum her yeri kapatıyorsun.
 
                                     <br><br>
-                                    Gelecekte hikayemiz nasıl şekillenecek, beraber neler yapacağız, nasıl bir hayatımız olacak... Düşündükçe heyecanlanıyorum yalan yok... 
-                                    İşte tam da bu yüzden sana bir sürpriz hazırladım. Bu uygulama, bizim hikâyemizi anlatacak. Her anımızı, her anımızın detayını, her anımızın hatırasını burada saklayacağız.
-                                    Çünkü bence bizim hikayemiz anlatmaya ve hatırlanmaya değer. Bende bu uygulama bizim hikayemizin dijital kanıtı olsun istedim. Asla silinmeyecek bir kanıt.
-                                    Geriye dönüp her anına bakabileceğimiz bir kanıt. Ve ileride bizim hikayemiz geliştikçe bu uygulama da gelişecek. Hala bu uygulamaya eklemek istediğim o kadar çok fikir var ki kafamda... 
+                                    Gelecekte hikayemiz nasıl şekillenecek, beraber neler yapacağız, nasıl bir hayatımız
+                                    olacak... Düşündükçe heyecanlanıyorum yalan yok...
+                                    İşte tam da bu yüzden sana bir sürpriz hazırladım. Bu uygulama, bizim hikâyemizi
+                                    anlatacak. Her anımızı, her anımızın detayını, her anımızın hatırasını burada
+                                    saklayacağız.
+                                    Çünkü bence bizim hikayemiz anlatmaya ve hatırlanmaya değer. Bende bu uygulama bizim
+                                    hikayemizin dijital kanıtı olsun istedim. Asla silinmeyecek bir kanıt.
+                                    Geriye dönüp her anına bakabileceğimiz bir kanıt. Ve ileride bizim hikayemiz
+                                    geliştikçe bu uygulama da gelişecek. Hala bu uygulamaya eklemek istediğim o kadar
+                                    çok fikir var ki kafamda...
                                     Bu sadece ilk versiyon. Umarım bu uygulama fikrini sende benim kadar seversin.
 
 
 
                                     <br><br>
 
-                                    Birinci ayımız kutlu olsun bitanem. Her daim yanında olacağımı asla unutma olur mu? Ne olursa olsun unutma.
-                                    Seni çok seviyorum. İyi ki varsın, iyi ki benimlesin. İyi ki seni tanımışım. İyi ki sana aşığım.
-                                                                                                        -B
+                                    Birinci ayımız kutlu olsun bitanem. Her daim yanında olacağımı asla unutma olur mu?
+                                    Ne olursa olsun unutma.
+                                    Seni çok seviyorum. İyi ki varsın, iyi ki benimlesin. İyi ki seni tanımışım. İyi ki
+                                    sana aşığım.
+                                    -B
 
                                 </p>
 
