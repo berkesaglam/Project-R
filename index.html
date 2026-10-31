@@ -90,6 +90,66 @@
                     </div>
                 </div>
             </div>
+            <!-- Couple Setup Screen -->
+            <div class="screen hidden" id="coupleSetupScreen">
+                <div class="splash">
+                    <div class="logo">R</div>
+
+                    <h1>PROJECT R</h1>
+                    <p class="codename">Bizim hikâyemiz.</p>
+
+                    <div class="authForm">
+                        <h2>Ortak Alana Katıl</h2>
+
+                        <p>
+                            Devam etmek için partnerinin oluşturduğu
+                            davet kodunu gir.
+                        </p>
+
+                        <form id="joinCoupleForm">
+                            <label for="inviteCodeInput">Davet Kodu</label>
+
+                            <input type="text" id="inviteCodeInput" placeholder="Davet kodunu gir" autocomplete="off"
+                                required>
+
+                            <button type="submit" id="joinCoupleButton">
+                                Ortak Alana Katıl
+                            </button>
+
+                            <p id="coupleSetupMessage" role="status"></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Couple Management Screen -->
+            <div class="screen hidden" id="coupleManagementScreen">
+                <div class="splash">
+                    <div class="logo">R</div>
+
+                    <h1>PROJECT R</h1>
+                    <p class="codename">Bizim hikâyemiz.</p>
+
+                    <div class="authForm">
+                        <h2>Ortak Alan Yönetimi</h2>
+
+                        <p>Partnerini ortak alanımıza davet et.</p>
+
+                        <button type="button" id="createInviteButton">
+                            Davet Kodu Oluştur
+                        </button>
+
+                        <div id="inviteResult" class="hidden">
+                            <p>Davet kodun:</p>
+                            <h2 id="generatedInviteCode"></h2>
+                            <button type="button" id="copyInviteButton">
+                                Kodu Kopyala
+                            </button>
+                        </div>
+
+                        <p id="inviteMessage" role="status"></p>
+                    </div>
+                </div>
+            </div>
             <!-- Home Screen -->
 
             <div class="screen hidden" id="homeScreen">

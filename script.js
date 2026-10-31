@@ -54,7 +54,8 @@ loadingText.textContent =
 const splashScreen = document.getElementById("splashScreen");
 const homeScreen = document.getElementById("homeScreen");
 const chapterScreen = document.getElementById("chapterScreen");
-
+const coupleSetupScreen = document.getElementById("coupleSetupScreen");
+const coupleManagementScreen = document.getElementById("coupleManagementScreen");
 /* ==========================
    SPLASH
 ========================== */
@@ -90,10 +91,11 @@ saveStats();
 setTimeout(async () => {
     const supabase = window.projectRSupabase;
 
-    // Önce tüm ana ekranları gizle.
     splashScreen.classList.add("hidden");
     authScreen.classList.add("hidden");
     homeScreen.classList.add("hidden");
+    coupleSetupScreen.classList.add("hidden");
+    coupleManagementScreen.classList.add("hidden");
 
     if (!supabase) {
         authScreen.classList.remove("hidden");
@@ -101,16 +103,28 @@ setTimeout(async () => {
         return;
     }
 
-    const { data, error } = await supabase.auth.getSession();
+    try {
+        const { data, error } = await supabase.auth.getSession();
 
-    if (error || !data.session) {
+        if (error) {
+            throw error;
+        }
+
+        if (!data.session) {
+            authScreen.classList.remove("hidden");
+            return;
+        }
+
+        await routeUserAfterLogin(data.session.user);
+
+    } catch (error) {
+        console.error("Oturum yönlendirme hatası:", error);
+
         authScreen.classList.remove("hidden");
-        return;
+        authMessage.textContent =
+            "Oturum kontrol edilirken bir hata oluştu.";
     }
-
-    homeScreen.classList.remove("hidden");
 }, 3000);
-
 
 /* ==========================
    GREETING
@@ -763,9 +777,43 @@ async function loadNotes() {
 
         notesContainer.innerHTML = "";
 
+        const senderIds = [...new Set(data.map(note => note.sender_id))];
+
+        const { data: profiles, error: profileError } = await supabase
+            .from("profiles")
+            .select("id, display_name")
+            .in("id", senderIds);
+
+        if (profileError) throw profileError;
+
+        const profileMap = new Map(
+            (profiles || []).map(profile => [profile.id, profile.display_name])
+        );
+        // Gelen okunmamış notları otomatik okundu işaretle
+        const unreadNoteIds = (data || [])
+            .filter(note => note.recipient_id === user.id && !note.read_at)
+            .map(note => note.id);
+
+        if (unreadNoteIds.length > 0) {
+            const { error: updateError } = await supabase
+                .from("notes")
+                .update({ read_at: new Date().toISOString() })
+                .in("id", unreadNoteIds)
+                .eq("recipient_id", user.id);
+
+            if (updateError) throw updateError;
+
+            // Arayüzde de hemen okundu olarak göster
+            data.forEach(note => {
+                if (unreadNoteIds.includes(note.id)) {
+                    note.read_at = new Date().toISOString();
+                }
+            });
+        }
+
         if (!data?.length) {
-            notesContainer.textContent =
-                "Henüz birbirinize not bırakmamışsınız. ❤️";
+            notesContainer.innerHTML = "<p class='empty-message'>Henüz bir not yok.</p>";
+            await loadUnreadNoteCount();
             return;
         }
 
@@ -781,10 +829,10 @@ async function loadNotes() {
             }
 
             const heading = document.createElement("strong");
-            heading.textContent = isReceived
-                ? "💌 Sana gelen not"
-                : "❤️ Senin bıraktığın not";
 
+            const senderName = profileMap.get(note.sender_id) || "Bilinmeyen kullanıcı";
+
+            heading.textContent = `❤️ ${senderName} bıraktı`;
             const message = document.createElement("p");
             message.textContent = note.content;
 
@@ -833,6 +881,7 @@ async function loadNotes() {
         notesContainer.textContent =
             error.message || "Notlar yüklenemedi.";
     }
+    await loadUnreadNoteCount();
 }
 async function getRecipientId(supabase, coupleId, currentUserId) {
     const { data, error } = await supabase
@@ -1419,9 +1468,9 @@ authForm.addEventListener("submit", async (event) => {
         authMessage.textContent = isRegisterMode
             ? "Hesap oluşturuldu."
             : "Giriş başarılı.";
-        if (!isRegisterMode) {
-            authScreen.classList.add("hidden");
-            homeScreen.classList.remove("hidden");
+
+        if (result.data.session) {
+            await routeUserAfterLogin(result.data.session.user);
         }
 
     } catch (error) {
@@ -1433,28 +1482,182 @@ authForm.addEventListener("submit", async (event) => {
         authSubmit.disabled = false;
     }
 });
-/* ==========================
-   SESSION RESTORE
-========================== */
+const joinCoupleForm = document.getElementById("joinCoupleForm");
+const inviteCodeInput = document.getElementById("inviteCodeInput");
+const joinCoupleButton = document.getElementById("joinCoupleButton");
+const coupleSetupMessage = document.getElementById("coupleSetupMessage");
 
-async function restoreSession() {
+joinCoupleForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const supabase = window.projectRSupabase;
+    const inviteCode = inviteCodeInput.value.trim();
+
+    if (!inviteCode) {
+        coupleSetupMessage.textContent = "Davet kodunu girmelisin.";
+        return;
+    }
+
+    joinCoupleButton.disabled = true;
+    coupleSetupMessage.textContent = "Davet kodu kontrol ediliyor...";
+
+    try {
+        const { data, error } = await supabase.rpc(
+            "join_couple_space",
+            {
+                input_code: inviteCode
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        coupleSetupMessage.textContent = "Ortak alana başarıyla katıldın!";
+
+        const { data: userData, error: userError } =
+            await supabase.auth.getUser();
+
+        if (userError) {
+            throw userError;
+        }
+
+        await routeUserAfterLogin(userData.user);
+
+    } catch (error) {
+        console.error("Davetle katılma hatası:", error);
+
+        coupleSetupMessage.textContent =
+            error.message || "Davet koduyla katılırken bir hata oluştu.";
+    } finally {
+        joinCoupleButton.disabled = false;
+    }
+});
+const createInviteButton = document.getElementById("createInviteButton");
+const inviteResult = document.getElementById("inviteResult");
+const generatedInviteCode = document.getElementById("generatedInviteCode");
+const copyInviteButton = document.getElementById("copyInviteButton");
+const inviteMessage = document.getElementById("inviteMessage");
+
+let currentInviteCode = "";
+
+async function loadActiveInvite() {
     const supabase = window.projectRSupabase;
 
-    if (!supabase) {
-        authMessage.textContent = "Sunucu bağlantısı kurulamadı.";
-        return;
-    }
+    try {
+        const { data, error } = await supabase.rpc("get_active_couple_invite");
 
-    const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
 
-    if (error) {
-        console.error("Oturum kontrolü başarısız:", error.message);
-        return;
-    }
-
-    if (data.session) {
-        authScreen.classList.add("hidden");
-        homeScreen.classList.remove("hidden");
+        if (data) {
+            currentInviteCode = data;
+            generatedInviteCode.textContent = data;
+            inviteResult.classList.remove("hidden");
+            inviteMessage.textContent = "Aktif davet kodun yüklendi.";
+        } else {
+            currentInviteCode = "";
+            inviteResult.classList.add("hidden");
+            inviteMessage.textContent = "Henüz aktif bir davetin yok.";
+        }
+    } catch (error) {
+        console.error("Aktif davet yüklenemedi:", error);
+        inviteMessage.textContent = "Mevcut davet kodu yüklenemedi.";
     }
 }
 
+createInviteButton.addEventListener("click", async () => {
+    const supabase = window.projectRSupabase;
+
+    createInviteButton.disabled = true;
+    inviteMessage.textContent = "Davet kodu oluşturuluyor...";
+    inviteResult.classList.add("hidden");
+
+    try {
+        const { data, error } = await supabase.rpc("create_couple_invite");
+
+        if (error) {
+            throw error;
+        }
+
+        currentInviteCode = data;
+        generatedInviteCode.textContent = data;
+        inviteResult.classList.remove("hidden");
+        inviteMessage.textContent = "Davet kodun hazır.";
+    } catch (error) {
+        console.error("Davet oluşturma hatası:", error);
+        inviteMessage.textContent =
+            error.message || "Davet kodu oluşturulamadı.";
+    } finally {
+        createInviteButton.disabled = false;
+    }
+});
+
+copyInviteButton.addEventListener("click", async () => {
+    if (!currentInviteCode) return;
+
+    try {
+        await navigator.clipboard.writeText(currentInviteCode);
+        inviteMessage.textContent = "Davet kodu kopyalandı.";
+    } catch (error) {
+        console.error("Kopyalama hatası:", error);
+        inviteMessage.textContent = "Kod kopyalanamadı. Elle kopyalayabilirsin.";
+    }
+});
+async function routeUserAfterLogin(user) {
+    const supabase = window.projectRSupabase;
+
+    const { data: membership, error } = await supabase
+        .from("couple_members")
+        .select("couple_id, role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (error) {
+        throw error;
+    }
+
+    splashScreen.classList.add("hidden");
+    authScreen.classList.add("hidden");
+    homeScreen.classList.add("hidden");
+    coupleSetupScreen.classList.add("hidden");
+    coupleManagementScreen.classList.add("hidden");
+
+    if (!membership) {
+        coupleSetupScreen.classList.remove("hidden");
+        return;
+    }
+
+    if (membership.role === "owner") {
+        const { data: members, error: membersError } = await supabase
+            .from("couple_members")
+            .select("user_id")
+            .eq("couple_id", membership.couple_id);
+
+        if (membersError) {
+            throw membersError;
+        }
+
+        if (members.length < 2) {
+            coupleManagementScreen.classList.remove("hidden");
+            await loadActiveInvite();
+            return;
+        }
+    }
+
+    homeScreen.classList.remove("hidden");
+}
+
+
+
+async function logoutUser() {
+    const supabase = window.projectRSupabase;
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+        console.error("Çıkış yapılamadı:", error);
+        alert("Çıkış yapılırken hata oluştu.");
+        return;
+    }
+
+    window.location.reload();
+}
